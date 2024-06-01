@@ -27,7 +27,7 @@ class SeeProperties_GUI(Tk):
         entry_2.place( x=171.0, y=67.0, width=558.0, height=459.0 )
 
         # Button
-        button_1 = Button( text="by1", borderwidth=0, highlightthickness=0, command=lambda: print("button_1 clicked"), relief="flat" )
+        button_1 = Button( text="Volver", borderwidth=0, highlightthickness=0, command=lambda: print("button_1 clicked"), relief="flat" )
         button_1.place( x=9.0, y=67.0, width=149.0000762939453, height=49.0 )
 
 if __name__ == "__main__":
