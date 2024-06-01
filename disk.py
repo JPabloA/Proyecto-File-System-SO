@@ -63,7 +63,7 @@ class Disk:
 
         if (sectors_required > len(sectors_available)):
             print("Write: Space requested not available")
-            return []
+            return -1
         
         # 2. Get the sectors to be written
         selected_sectors = sectors_available[0:sectors_required]
@@ -85,7 +85,7 @@ class Disk:
         self.__listToDiskContent( disk_list )
 
         # 6. Return the list of ocuppied sectors
-        return [ sector[0] for sector in selected_sectors ]
+        return selected_sectors[0][0]
 
     # Read from the virtual disk
     def readFromDisk(self, sector_id: int):
@@ -108,14 +108,19 @@ class Disk:
         return content
 
     # Remove from the virtual disk
-    def removeFromDisk(self, sectors_ids: list[int]):
+    def removeFromDisk(self, sector_id: int):
         # 0. Get the disk as a list
         disk_list = self.__diskContentToList()
+        disk_pointer = sector_id
 
         # 1. Write the data from the sectors list
-        for sector_id in sectors_ids:
-            disk_list[ sector_id ] = f"{sector_id}:00-1:{ '0' * (self.__sector_size - self.__pointer_size) }\n"
-            self.__free_sectors[ sector_id ] = (sector_id, SectorState.FREE)
+        while disk_pointer != -1:
+            disk_line = disk_list[disk_pointer].split(":")
+
+            disk_list[disk_pointer] = f"{disk_pointer}:00-1:{ '0' * (self.__sector_size - self.__pointer_size) }\n"
+            self.__free_sectors[ disk_pointer ] = (disk_pointer, SectorState.FREE)
+
+            disk_pointer = -1 if disk_line[1] == "00-1" else int(disk_line[1])
 
         # 2. Write the clear content into disk
         self.__listToDiskContent( disk_list )
