@@ -51,6 +51,9 @@ class Disk:
 
         # If is an existing file (Modification), delete its previous content
         if (sector_id != -1):
+
+            # TODO: Cuando se modifica el contenido -> Asegurar que hay campo antes de eliminarlo
+
             self.removeFromDisk( sector_id )
 
         data_size = self.__sector_size - self.__pointer_size
@@ -68,7 +71,7 @@ class Disk:
         if (sectors_required > len(sectors_available)):
             print("Write: Space requested not available")
             return -1
-        
+
         # 2. Get the sectors to be written
         selected_sectors = sectors_available[0:sectors_required]
 
@@ -96,7 +99,7 @@ class Disk:
         if sector_id < 0 or sector_id >= self.__num_sectors:
             print("Read: Sector ID out of sector bounds")
             return
-        
+
         disk_list = self.__diskContentToList()
         disk_pointer = sector_id
 
