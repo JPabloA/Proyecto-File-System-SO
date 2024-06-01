@@ -27,7 +27,7 @@ def createFile(self, name, extension, content):
     
     # to assign file sectors (Then we need to separate the function)
     
-    
+    index = self.disk.writeToDisk(content); 
     
 def createDirectory(self,name):
     self.currentDirectory.createDirectory(self, name);
