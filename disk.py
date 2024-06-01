@@ -8,6 +8,7 @@ class Disk:
     __file_name: str = "disk.txt"
     __num_sectors: int = 0
     __sector_size: int = 0
+    __pointer_size: int = 4
 
     # TODO: La lista de sectores libres se maneja en disco?
     __free_sectors: list = []
@@ -24,7 +25,7 @@ class Disk:
 
         # TODO: Fill disk file with default structure
         for i in range(0, self.__num_sectors):
-            f.write(f"{i}: { '0' * self.__sector_size }\n")
+            f.write(f"{i}:00-1:{ '0' * (self.__sector_size - self.__pointer_size) }\n")
 
         f.close()
 
@@ -47,11 +48,14 @@ class Disk:
 
     # Write into the virtual disk
     def writeToDisk(self, sector_content: str):
+
+        data_size = self.__sector_size - self.__pointer_size
+
         # 0. Divide the content in string chunks of the size of a sector
-        content_chunks = [sector_content[i:i+self.__sector_size] for i in range(0, len(sector_content), self.__sector_size)]
+        content_chunks = [sector_content[i:i + data_size] for i in range(0, len(sector_content), data_size)]
 
         # 0.1 Fill the last sector with non-use space (Intern Fragmentation)
-        content_chunks[-1] = content_chunks[-1].ljust(self.__sector_size, "0")
+        content_chunks[-1] = content_chunks[-1].ljust(data_size, "0")
 
         # 1. Get the sector content size to check if there is space left
         sectors_required  = len(content_chunks)
@@ -59,7 +63,7 @@ class Disk:
 
         if (sectors_required > len(sectors_available)):
             print("Write: Space requested not available")
-            return
+            return []
         
         # 2. Get the sectors to be written
         selected_sectors = sectors_available[0:sectors_required]
@@ -68,12 +72,20 @@ class Disk:
         disk_list = self.__diskContentToList()
 
         # 4. Update the disk content based on the selected_sectors
-        for sector, sector_content in zip(selected_sectors, content_chunks):
-            disk_list[ sector[0] ] = f"{sector[0]}: {sector_content}\n"
-            self.__free_sectors[ sector[0] ] = (self.__free_sectors[ sector[0] ], SectorState.OCCUPIED)
+        for i in range(0, len(selected_sectors)):
+            sector_id = selected_sectors[i][0]
+            sector_content = content_chunks[i]
+            next_sector_id = selected_sectors[i + 1][0] if (i + 1) < len(selected_sectors) else -1
+            next_sector_id = str(next_sector_id).rjust(self.__pointer_size, "0")
+
+            disk_list[ sector_id ] = f"{sector_id}:{next_sector_id}:{sector_content}\n"
+            self.__free_sectors[ sector_id ] = (self.__free_sectors[ sector_id ], SectorState.OCCUPIED)
 
         # 5. Write the new content into disk
         self.__listToDiskContent( disk_list )
+
+        # 6. Return the list of ocuppied sectors
+        return [ sector[0] for sector in selected_sectors ]
 
     # Read from the virtual disk
     def readFromDisk(self, sector_id: int):
@@ -82,7 +94,18 @@ class Disk:
             return
         
         disk_list = self.__diskContentToList()
-        return disk_list[ sector_id ]
+        disk_pointer = sector_id
+
+        content = ""
+        while disk_pointer != -1:
+            disk_line = disk_list[disk_pointer].split(":")
+            content += disk_line[2].strip("\n")
+
+            disk_pointer = -1 if disk_line[1] == "00-1" else int(disk_line[1])
+
+        content = content.rstrip("0")
+        print(content)
+        return content
 
     # Remove from the virtual disk
     def removeFromDisk(self, sectors_ids: list[int]):
@@ -91,7 +114,7 @@ class Disk:
 
         # 1. Write the data from the sectors list
         for sector_id in sectors_ids:
-            disk_list[ sector_id ] = f"{sector_id}: {'0' * self.__sector_size}\n"
+            disk_list[ sector_id ] = f"{sector_id}:00-1:{ '0' * (self.__sector_size - self.__pointer_size) }\n"
             self.__free_sectors[ sector_id ] = (sector_id, SectorState.FREE)
 
         # 2. Write the clear content into disk
