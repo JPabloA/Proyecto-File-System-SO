@@ -1,14 +1,16 @@
+from FileSystem import FileSystem
 from disk import Disk
 
-# 4: pointer y 16 data = 20 bytes en total
-obj = Disk(8, 20)
+fileSystem = FileSystem()
 
-obj.createDisk()
+fileSystem.create_disk(20, 20)
 
-obj.writeToDisk("Si cabe pero en 2 partes mi bro")
-obj.writeToDisk("Esto se elimina de una vez y muchísimo más extenso")
-obj.writeToDisk("Si cabe pero en 2 partes mi bro")
+fileSystem.createFile("Hola", ".txt", "Hola soy el contenido")
 
-obj.removeFromDisk(2)
+# fileSystem.createFile("Hola", ".txt", "Hola soy el contenido")
 
-obj.readFromDisk(0)
+fileSystem.createFile("Hola2", ".txt", "Soy algo completamente diferente")
+
+fileSystem.createDirectory("Carpeta")
+
+fileSystem.listDirectory()

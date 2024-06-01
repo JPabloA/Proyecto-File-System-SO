@@ -47,7 +47,11 @@ class Disk:
         print("Virtual disk created!")
 
     # Write into the virtual disk
-    def writeToDisk(self, sector_content: str):
+    def writeToDisk(self, sector_content: str, sector_id: int = -1):
+
+        # If is an existing file (Modification), delete its previous content
+        if (sector_id != -1):
+            self.removeFromDisk( sector_id )
 
         data_size = self.__sector_size - self.__pointer_size
 
