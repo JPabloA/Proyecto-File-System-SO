@@ -1,18 +1,17 @@
-import toplevel_windows.showTree_GUI as showTree_GUI
-import toplevel_windows.createDirectory_GUI as createDirectory_GUI
-import toplevel_windows.move_GUI as move_GUI
-import toplevel_windows.seeProperties_GUI as seeProperties_GUI
-import toplevel_windows.createDisk_GUI as createDisk_GUI
-import toplevel_windows.copy_GUI as copy_GUI
-import toplevel_windows.createFile_GUI as createFile_GUI
-import toplevel_windows.editFile_GUI as editFile_GUI
+import GUI.showTree_GUI as showTree_GUI
+import GUI.createDirectory_GUI as createDirectory_GUI
+import GUI.move_GUI as move_GUI
+import GUI.seeProperties_GUI as seeProperties_GUI
+import GUI.createDisk_GUI as createDisk_GUI
+import GUI.copy_GUI as copy_GUI
+import GUI.createFile_GUI as createFile_GUI
+import GUI.editFile_GUI as editFile_GUI
 from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu
 
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-from FileSystem import FileSystem
+from src.FileSystem import FileSystem
 
 class FileSystem_GUI(Tk):
 

@@ -1,6 +1,6 @@
-from file import File
-from directory import Directory
-from disk import Disk
+from .file import File
+from .directory import Directory
+from .disk import Disk
 
 class FileSystem:
     def __init__(self):

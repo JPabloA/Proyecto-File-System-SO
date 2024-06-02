@@ -2,8 +2,7 @@ import sys
 import os
 from tkinter import Canvas, Entry, Button, Toplevel
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-import FileSystem
+import src.FileSystem as FileSystem
 
 class CreateDisk_GUI(Toplevel):
     def __init__(self, parent):
