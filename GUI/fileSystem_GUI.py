@@ -48,7 +48,7 @@ class FileSystem_GUI(Tk):
         button_2 = Button( text="Crear Directorio", borderwidth=0, command=self.display_CreateDirectory_GUI, relief="flat" )
         button_2.place( x=9.0, y=119.0, width=150.0, height=35.0 )
 
-        button_3 = Button( text="Crear Archivo", borderwidth=0, command=lambda: print("button_3 clicked"), relief="flat" )
+        button_3 = Button( text="Crear Archivo", borderwidth=0, command=self.display_CreateFile_GUI, relief="flat" )
         button_3.place( x=9.0, y=166.0, width=150.0, height=35.0 )
 
         button_4 = Button( text="Desp. Árbol", borderwidth=0, command=self.display_WindowShowTree, relief="flat" )
@@ -74,7 +74,7 @@ class FileSystem_GUI(Tk):
         print(selected_item)
 
         menu = Menu( tearoff=0 )
-        menu.add_command(label="Abrir", font="Arial 12")
+        menu.add_command(label="Abrir", font="Arial 12", command=self.display_EditFile_GUI)
         menu.add_command(label="Eliminar", font="Arial 12")
         menu.add_command(label="Copiar", font="Arial 12", command=self.display_Copy_GUI)
         menu.add_command(label="Mover", font="Arial 12", command=self.display_Move_GUI)
