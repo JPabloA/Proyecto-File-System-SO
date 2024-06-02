@@ -8,9 +8,6 @@ import GUI.createFile_GUI as createFile_GUI
 import GUI.editFile_GUI as editFile_GUI
 from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu
 
-import sys
-import os
-
 from src.FileSystem import FileSystem
 
 class FileSystem_GUI(Tk):

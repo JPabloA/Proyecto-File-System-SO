@@ -1,5 +1,3 @@
-import sys
-import os
 from tkinter import Canvas, Entry, Button, Toplevel
 
 import src.FileSystem as FileSystem
