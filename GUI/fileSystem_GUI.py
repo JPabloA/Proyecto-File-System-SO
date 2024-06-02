@@ -1,4 +1,4 @@
-import toplevel_windows.showTree_GUI as showTree_GUI, createDirectory_GUI
+import toplevel_windows.showTree_GUI as showTree_GUI, createDirectory_GUI, move_GUI, seeProperties_GUI
 from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu
 
 class FileSystem_GUI(Tk):
@@ -73,8 +73,8 @@ class FileSystem_GUI(Tk):
         menu.add_command(label="Abrir", font="Arial 12")
         menu.add_command(label="Eliminar", font="Arial 12")
         menu.add_command(label="Copiar", font="Arial 12")
-        menu.add_command(label="Mover", font="Arial 12")
-        menu.add_command(label="Ver propiedades", font="Arial 12")
+        menu.add_command(label="Mover", font="Arial 12", command=self.display_Move_GUI)
+        menu.add_command(label="Ver propiedades", font="Arial 12", command=self.display_seeProperties)
 
         try:
             menu.tk_popup(event.x_root, event.y_root)
@@ -95,6 +95,15 @@ class FileSystem_GUI(Tk):
     def display_WindowShowTree(self):
         window = showTree_GUI.ShowTree_GUI(self)
         window.grab_set()
+
+    def display_Move_GUI(self):
+        window = move_GUI.Move_GUI(self)
+        window.grab_set()
+
+    def display_seeProperties(self):
+        window = seeProperties_GUI.SeeProperties_GUI(self)
+        window.grab_set()
+
 
 if __name__ == "__main__":
     app = FileSystem_GUI()
