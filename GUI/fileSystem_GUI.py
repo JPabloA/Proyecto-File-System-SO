@@ -1,4 +1,5 @@
 import toplevel_windows.showTree_GUI as showTree_GUI, createDirectory_GUI
+import toplevel_windows.createDisk_GUI as createDisk_GUI
 from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu
 
 class FileSystem_GUI(Tk):
@@ -38,7 +39,7 @@ class FileSystem_GUI(Tk):
 
         self.__loadContentInFSDisplay(textArea_Display)
 
-        button_1 = Button( text="Crear Disco", command=lambda: print("button_1 clicked"), relief="flat" )
+        button_1 = Button( text="Crear Disco", command=self.display_CreateDisk_GUI, relief="flat" )
         button_1.place( x=9.0, y=72.0, width=150.0, height=35.0 )
 
         button_2 = Button( text="Crear Directorio", borderwidth=0, command=self.display_CreateDirectory_GUI, relief="flat" )
@@ -94,6 +95,10 @@ class FileSystem_GUI(Tk):
 
     def display_WindowShowTree(self):
         window = showTree_GUI.ShowTree_GUI(self)
+        window.grab_set()
+
+    def display_CreateDisk_GUI(self):
+        window = createDisk_GUI.CreateDisk_GUI(self)
         window.grab_set()
 
 if __name__ == "__main__":
