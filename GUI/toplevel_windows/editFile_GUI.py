@@ -1,10 +1,9 @@
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
 
-class CreateFile(Toplevel):
-    def __init__(self, master):
-        super().__init__(master)
-        self.master = master
-        self.title("Create File")
+class EditFile(Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Edit File")
         self.geometry("750x550")
         self.configure(bg="#FFFFFF")
         self.resizable(False, False)
@@ -19,7 +18,8 @@ class CreateFile(Toplevel):
             relief="ridge"
         )
         canvas.place(x=0, y=0)
-
+        
+        # Text input: Directory path
         self.entry_1 = Entry(
             self,
             bd=0,
@@ -30,6 +30,7 @@ class CreateFile(Toplevel):
         self.entry_1.insert(0, "RUTA DEL ARCHIVO")
         self.entry_1.place(x=9.0, y=10.0, width=722.0, height=33.0)
 
+        # Button: To save changes
         self.button_1 = Button(
             self,
             text = "Guardar",
@@ -40,6 +41,7 @@ class CreateFile(Toplevel):
         )
         self.button_1.place(x=9.0, y=67.0, width=149.0000762939453, height=49.0)
 
+        # Text input: To modify the content of the file
         self.entry_2 = Text(
             self,
             bd=0,

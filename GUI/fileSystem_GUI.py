@@ -1,5 +1,8 @@
 import toplevel_windows.showTree_GUI as showTree_GUI, createDirectory_GUI, move_GUI, seeProperties_GUI
 import toplevel_windows.createDisk_GUI as createDisk_GUI
+import toplevel_windows.copy_GUI as copy_GUI
+import toplevel_windows.createFile_GUI as createFile_GUI
+import toplevel_windows.editFile_GUI as editFile_GUI
 from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu
 
 class FileSystem_GUI(Tk):
@@ -73,7 +76,7 @@ class FileSystem_GUI(Tk):
         menu = Menu( tearoff=0 )
         menu.add_command(label="Abrir", font="Arial 12")
         menu.add_command(label="Eliminar", font="Arial 12")
-        menu.add_command(label="Copiar", font="Arial 12")
+        menu.add_command(label="Copiar", font="Arial 12", command=self.display_Copy_GUI)
         menu.add_command(label="Mover", font="Arial 12", command=self.display_Move_GUI)
         menu.add_command(label="Ver propiedades", font="Arial 12", command=self.display_seeProperties)
 
@@ -109,6 +112,18 @@ class FileSystem_GUI(Tk):
         window = seeProperties_GUI.SeeProperties_GUI(self)
         window.grab_set()
 
+    # TODO: Verify if they work correctly (These 3 functions)
+    def display_Copy_GUI(self):
+        window = copy_GUI.CopyFiles(self)
+        window.grab_set()
+    
+    def display_CreateFile_GUI(self):
+        window = createFile_GUI.CreateFile(self)
+        window.grab_set()
+    
+    def display_EditFile_GUI(self):
+        window = editFile_GUI.EditFile(self)
+        window.grab_set()       
 
 if __name__ == "__main__":
     app = FileSystem_GUI()
