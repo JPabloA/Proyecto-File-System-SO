@@ -90,7 +90,7 @@ class FileSystem_GUI(Tk):
 
 
     def display_WindowShowTree(self):
-        window = showTree_GUI.Window_ShowTree(self)
+        window = showTree_GUI.ShowTree_GUI(self)
         window.grab_set()
 
 if __name__ == "__main__":
