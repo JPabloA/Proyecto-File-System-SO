@@ -4,7 +4,7 @@ from disk import Disk
 
 class FileSystem:
     def __init__(self):
-        self.root = Directory("root");
+        self.root = Directory("/root");
         self.currentDirectory = self.root
         self.disk = None
 
@@ -34,6 +34,8 @@ class FileSystem:
         self.currentDirectory.files[name] = newFile
         # to assign file sectors (Then we need to separate the function)
 
+    def getCurrentWorkingDirectory(self):
+        return self.currentDirectory.getDirectoryName()
 
     def createDirectory(self,name):
         self.currentDirectory.createDirectory(name);

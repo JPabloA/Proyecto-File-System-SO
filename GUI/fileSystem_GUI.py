@@ -5,7 +5,16 @@ import toplevel_windows.createFile_GUI as createFile_GUI
 import toplevel_windows.editFile_GUI as editFile_GUI
 from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu
 
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from FileSystem import FileSystem
+
 class FileSystem_GUI(Tk):
+
+    fileSystem: FileSystem
+
     def __init__(self):
         super().__init__()
 
@@ -23,13 +32,18 @@ class FileSystem_GUI(Tk):
             relief = "ridge"
         )
 
+        # Get the current directory
+        self.fileSystem = FileSystem()
+
         # Label "Buscador"
         canvas.place(x = 0, y = 0)
         canvas.create_text( 9, 445.0, anchor="nw", text="Buscador", fill="#000000", font=("Inter", 13 * -1) )
 
         # Text input: Directory path
-        textInput_DirectoryPath = Entry( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
-        textInput_DirectoryPath.place( x=9.0, y=11.0, width=722.0, height=37.0 )
+        textInput_DirectoryPath = Entry( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, font=("Inter", 14))
+        textInput_DirectoryPath.place( x=9.0, y=11.0, width=667.0, height=37.0 )
+
+        self.__loadCurrentWorkingDirectory(textInput_DirectoryPath)
 
         # Text input: Search bar
         textInput_SearchBar = Entry( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
@@ -41,6 +55,10 @@ class FileSystem_GUI(Tk):
         textArea_Display.bind("<Button-3>", lambda event: self.__contentDisplayRightClick(event, textArea_Display))
 
         self.__loadContentInFSDisplay(textArea_Display)
+
+        # Button: Refresh display directory
+        button_UpdateDirectory = Button( text="↺", command=lambda: self.__loadContentInFSDisplay(textArea_Display) , relief="flat", font="Arial 16" )
+        button_UpdateDirectory.place( x=696.0, y=11.0, width=35.0, height=35.0 )
 
         button_1 = Button( text="Crear Disco", command=self.display_CreateDisk_GUI, relief="flat" )
         button_1.place( x=9.0, y=72.0, width=150.0, height=35.0 )
@@ -56,6 +74,12 @@ class FileSystem_GUI(Tk):
 
         button_5 = Button( text="Buscar", borderwidth=0, command=lambda: print("button_5 clicked"), relief="flat" )
         button_5.place( x=9.0, y=503.0, width=150.0, height=30.0 )
+
+    def __loadCurrentWorkingDirectory(self, path_field: Entry):
+        cwd = self.fileSystem.getCurrentWorkingDirectory()
+
+        path_field.insert(0, cwd)
+        path_field.config(state="disabled")
 
     def __contentDisplayRightClick(self, event, display: Listbox):
 
@@ -86,6 +110,10 @@ class FileSystem_GUI(Tk):
             menu.grab_release()
 
     def __loadContentInFSDisplay(self, display: Listbox):
+
+        print("Loading directories and files...")
+        display.delete(0, "end")
+
         # TODO: Gather files and folders
         content = ["Carpeta1", "Carpeta2", "Carpeta3", "File1", "File2"]
 
