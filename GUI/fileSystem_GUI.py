@@ -1,5 +1,4 @@
-import toplevel_windows.showTree_GUI as showTree_GUI
-import move_GUI
+import toplevel_windows.showTree_GUI as showTree_GUI, createDirectory_GUI
 from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu
 
 class FileSystem_GUI(Tk):
@@ -42,7 +41,7 @@ class FileSystem_GUI(Tk):
         button_1 = Button( text="Crear Disco", command=lambda: print("button_1 clicked"), relief="flat" )
         button_1.place( x=9.0, y=72.0, width=150.0, height=35.0 )
 
-        button_2 = Button( text="Crear Directorio", borderwidth=0, command=self.display_Move_GUI, relief="flat" )
+        button_2 = Button( text="Crear Directorio", borderwidth=0, command=self.display_CreateDirectory_GUI, relief="flat" )
         button_2.place( x=9.0, y=119.0, width=150.0, height=35.0 )
 
         button_3 = Button( text="Crear Archivo", borderwidth=0, command=lambda: print("button_3 clicked"), relief="flat" )
@@ -89,8 +88,8 @@ class FileSystem_GUI(Tk):
         for i in range(0, len(content)):
             display.insert(i, content[i])
 
-    def display_Move_GUI(self):
-        window = move_GUI.Move_GUI(self)
+    def display_CreateDirectory_GUI(self):
+        window = createDirectory_GUI.CreateDirectory_GUI(self)
         window.grab_set()
 
     def display_WindowShowTree(self):
