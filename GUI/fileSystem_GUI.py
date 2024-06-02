@@ -1,5 +1,5 @@
 import toplevel_windows.showTree_GUI as showTree_GUI
-from tkinter import SINGLE, END, Event, Tk, Canvas, Entry, Button, Listbox, Menu
+from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu
 
 class FileSystem_GUI(Tk):
     def __init__(self):

@@ -1,4 +1,4 @@
-from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
+from tkinter import Canvas, Entry, Text, Button, Toplevel
 
 class ShowTree_GUI(Toplevel):
     def __init__(self, parent):
