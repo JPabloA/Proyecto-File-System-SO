@@ -27,7 +27,7 @@ class CopyFiles(Toplevel):
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_1.insert(0, "ORIGEN")
+        self.entry_1.insert("1.0", "ORIGEN")
         self.entry_1.place(x=14.0, y=45.0, width=722.0, height=33.0)
 
         # Text input: Directory path (Destiny)
@@ -38,7 +38,7 @@ class CopyFiles(Toplevel):
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_2.insert(0, "DESTINO")
+        self.entry_2.insert("1.0", "DESTINO")
         self.entry_2.place(x=14.0, y=146.0, width=722.0, height=33.0)
 
         # Button: First method to copy
