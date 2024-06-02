@@ -52,6 +52,7 @@ class FileSystem_GUI(Tk):
         textArea_Display = Listbox( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, selectmode=SINGLE, font="Arial 14" )
         textArea_Display.place( x=173.0, y=72.0, width=558.0, height=459.0 )
         textArea_Display.bind("<Button-3>", lambda event: self.__contentDisplayRightClick(event, textArea_Display))
+        textArea_Display.bind("<Double-Button-1>", self.__onFSDoubleClick)
 
         self.__loadContentInFSDisplay(textArea_Display)
 
@@ -74,14 +75,26 @@ class FileSystem_GUI(Tk):
         button_5 = Button( text="Buscar", borderwidth=0, command=lambda: print("button_5 clicked"), relief="flat" )
         button_5.place( x=9.0, y=503.0, width=150.0, height=30.0 )
 
+    def __onFSDoubleClick(self, event):
+        widget = event.widget
+        selection = widget.curselection()
+        if selection:
+            index = selection[0]
+            value = widget.get(index)
+
+            if "Carpeta" in value:
+                print("Abriendo carpeta...")
+            else:
+                print("Abriendo archivo...")
+
     def __loadCurrentWorkingDirectory(self, path_field: Entry):
         cwd = self.fileSystem.getCurrentWorkingDirectory()
 
+        path_field.config(state="normal")
         path_field.insert(0, cwd)
         path_field.config(state="disabled")
 
     def __contentDisplayRightClick(self, event, display: Listbox):
-
         # Get the selected file/directory
         try:
             index = display.nearest(event.y)
