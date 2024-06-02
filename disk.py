@@ -5,7 +5,7 @@ class SectorState(Enum):
     OCCUPIED = 1
 
 class Disk:
-    __file_name: str = "disk.txt"
+    __file_name: str = "../disk.txt"
     __num_sectors: int = 0
     __sector_size: int = 0
     __pointer_size: int = 4
