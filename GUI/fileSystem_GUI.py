@@ -96,6 +96,7 @@ class FileSystem_GUI(Tk):
             return
 
         print(selected_item)
+        print("PRUEBA")
 
         menu = Menu( tearoff=0 )
         menu.add_command(label="Abrir", font="Arial 12", command=self.display_EditFile_GUI)
