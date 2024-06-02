@@ -8,9 +8,6 @@ class Disk:
     __file_name: str = "./src/disk.txt"
     __num_sectors: int = 0
     __sector_size: int = 0
-    __pointer_size: int = 4
-
-    # TODO: La lista de sectores libres se maneja en disco?
     __free_sectors: list = []
 
     # Constructor: Set the num_sectors
@@ -23,9 +20,8 @@ class Disk:
     def __createFile(self):
         f = open(self.__file_name, "w")
 
-        # TODO: Fill disk file with default structure
         for i in range(0, self.__num_sectors):
-            f.write(f"{i}:00-1:{ '0' * (self.__sector_size - self.__pointer_size) }\n")
+            f.write(f"{i}:{ '0' * self.__sector_size }\n")
 
         f.close()
 
@@ -40,6 +36,14 @@ class Disk:
         with open(self.__file_name, "w") as file:
             file.writelines(lines)
 
+    # Private: Divide the content in string chunks of the size of a sector
+    def __splitContentInChunks(self, content):
+        content_chunks: list[str] = [content[i:i + self.__sector_size] for i in range(0, len(content), self.__sector_size)]
+
+        # Fill the last sector with non-use space (Intern Fragmentation)
+        content_chunks[-1] = content_chunks[-1].ljust(self.__sector_size, "0")
+        return content_chunks
+
     # Create the virtual disk file
     def createDisk(self):
         print("Creating virtual disk...")
@@ -47,87 +51,122 @@ class Disk:
         print("Virtual disk created!")
 
     # Write into the virtual disk
-    def writeToDisk(self, sector_content: str, sector_id: int = -1):
+    def writeToDisk(self, sector_content: str, sectors_list: list[int] = []):
 
-        # If is an existing file (Modification), delete its previous content
-        if (sector_id != -1):
+        # 0. Split content in chunks of the size of the sector
+        content_chunks = self.__splitContentInChunks( sector_content )
 
-            # TODO: Cuando se modifica el contenido -> Asegurar que hay campo antes de eliminarlo
-
-            self.removeFromDisk( sector_id )
-
-        data_size = self.__sector_size - self.__pointer_size
-
-        # 0. Divide the content in string chunks of the size of a sector
-        content_chunks = [sector_content[i:i + data_size] for i in range(0, len(sector_content), data_size)]
-
-        # 0.1 Fill the last sector with non-use space (Intern Fragmentation)
-        content_chunks[-1] = content_chunks[-1].ljust(data_size, "0")
-
-        # 1. Get the sector content size to check if there is space left
-        sectors_required  = len(content_chunks)
-        sectors_available = list( filter(lambda s: s[1] == SectorState.FREE, self.__free_sectors) )
-
-        if (sectors_required > len(sectors_available)):
-            print("Write: Space requested not available")
-            return -1
-
-        # 2. Get the sectors to be written
-        selected_sectors = sectors_available[0:sectors_required]
-
-        # 3. Get the disk as a list
+        # 1. Get the disk as a list
         disk_list = self.__diskContentToList()
 
-        # 4. Update the disk content based on the selected_sectors
-        for i in range(0, len(selected_sectors)):
-            sector_id = selected_sectors[i][0]
-            sector_content = content_chunks[i]
-            next_sector_id = selected_sectors[i + 1][0] if (i + 1) < len(selected_sectors) else -1
-            next_sector_id = str(next_sector_id).rjust(self.__pointer_size, "0")
+        # 2. Get the list of available sectors
+        sectors_available = list( filter(lambda s: s[1] == SectorState.FREE, self.__free_sectors) )
 
-            disk_list[ sector_id ] = f"{sector_id}:{next_sector_id}:{sector_content}\n"
-            self.__free_sectors[ sector_id ] = (self.__free_sectors[ sector_id ], SectorState.OCCUPIED)
+        occupied_sectors = []
+
+        # Case: Creating an non-existing file
+        if len(sectors_list) == 0:
+            # 3. Get the count of sectors required to check if there is space left
+            sectors_required  = len(content_chunks)
+
+            if (sectors_required > len(sectors_available)):
+                print("Write: Space requested not available")
+                return []
+
+            # 4. Get the sectors to be written
+            selected_sectors = sectors_available[0:sectors_required]
+
+            # 5. Update the disk content based on the selected_sectors
+            for i in range(0, len(selected_sectors)):
+                sector_id = selected_sectors[i][0]
+                sector_content = content_chunks[i]
+
+                occupied_sectors.append( sector_id )
+
+                disk_list[ sector_id ] = f"{sector_id}:{sector_content}\n"
+                self.__free_sectors[ sector_id ] = (sector_id, SectorState.OCCUPIED)
+
+        # Case: Modifying an existing file
+        else:
+            # 3. Check if the modification requieres more space
+            sectors_required = len(content_chunks) - len(sectors_list)
+
+            if (sectors_required > 0 and sectors_required > len(sectors_available)):
+                print("Write: Space requested not available")
+                return []
+
+            # 4. Get the sectors to be written
+            selected_sectors = sectors_available[0:sectors_required]
+
+            # 5: Modify the existing data
+            for index, sector_id in enumerate(sectors_list):
+                if index < len(content_chunks):
+                    sector_content = content_chunks[index]
+                    disk_list[sector_id] = f"{sector_id}:{sector_content}"
+                else:
+                    break
+
+            occupied_sectors.extend(sectors_list[0:len(content_chunks)])
+
+            # Case 1: The file is equal or bigger in size (Requiered 0 or more sectors)
+            if sectors_required >= 0:
+
+                # Second: Add the left data
+                selected_sectors_index = 0
+                for i in range(len( sectors_list ), len( content_chunks )):
+                    sector_id = selected_sectors[ selected_sectors_index ][0]
+                    sector_content = content_chunks[i]
+
+                    selected_sectors_index += 1
+                    occupied_sectors.append( sector_id )
+
+                    disk_list[ sector_id ] = f"{sector_id}:{sector_content}\n"
+                    self.__free_sectors[ sector_id ] = (sector_id, SectorState.OCCUPIED)
+
+            # Case 2: The file is smaller in size (Requiered free sectors)
+            else:
+                # Second: Remove the usused occupied space
+                self.removeFromDisk( sectors_list[ len( content_chunks ): ] )
+
 
         # 5. Write the new content into disk
         self.__listToDiskContent( disk_list )
 
         # 6. Return the list of ocuppied sectors
-        return selected_sectors[0][0]
+        return occupied_sectors
 
     # Read from the virtual disk
-    def readFromDisk(self, sector_id: int):
-        if sector_id < 0 or sector_id >= self.__num_sectors:
-            print("Read: Sector ID out of sector bounds")
-            return
+    def readFromDisk(self, sectors_list: list[int]):
 
         disk_list = self.__diskContentToList()
-        disk_pointer = sector_id
 
         content = ""
-        while disk_pointer != -1:
-            disk_line = disk_list[disk_pointer].split(":")
-            content += disk_line[2].strip("\n")
+        for sector_id in sectors_list:
+            if sector_id < 0 or sector_id >= self.__num_sectors:
+                print(f"Sector ID {sector_id} out of bounds")
+                continue
 
-            disk_pointer = -1 if disk_line[1] == "00-1" else int(disk_line[1])
+            disk_line = disk_list[ sector_id ].split(":")
+            content += disk_line[1].strip("\n")
 
         content = content.rstrip("0")
-        print(content)
         return content
 
     # Remove from the virtual disk
-    def removeFromDisk(self, sector_id: int):
+    def removeFromDisk(self, sectors_list: list[int]):
         # 0. Get the disk as a list
         disk_list = self.__diskContentToList()
-        disk_pointer = sector_id
 
         # 1. Write the data from the sectors list
-        while disk_pointer != -1:
-            disk_line = disk_list[disk_pointer].split(":")
+        for sector_id in sectors_list:
+            if sector_id < 0 or sector_id >= self.__num_sectors:
+                print(f"Sector ID {sector_id} out of bounds")
+                continue
 
-            disk_list[disk_pointer] = f"{disk_pointer}:00-1:{ '0' * (self.__sector_size - self.__pointer_size) }\n"
-            self.__free_sectors[ disk_pointer ] = (disk_pointer, SectorState.FREE)
+            disk_line = disk_list[ sector_id ].split(":")
+            disk_list[ sector_id ] = f"{sector_id}:{'0' * self.__sector_size}"
+            self.__free_sectors[ sector_id ] = (sector_id, SectorState.FREE)
 
-            disk_pointer = -1 if disk_line[1] == "00-1" else int(disk_line[1])
 
         # 2. Write the clear content into disk
         self.__listToDiskContent( disk_list )
