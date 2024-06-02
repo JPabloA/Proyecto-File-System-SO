@@ -27,7 +27,7 @@ class CreateFile(Toplevel):
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_1.insert("1.0", "RUTA DEL ARCHIVO")
+        self.entry_1.insert(0, "RUTA DEL ARCHIVO")
         self.entry_1.place(x=9.0, y=10.0, width=722.0, height=33.0)
 
         # Button: To save the content
