@@ -1,5 +1,5 @@
-import window_ShowTree
-from tkinter import SINGLE, Tk, Canvas, Entry, Button, Listbox
+import toplevel_windows.showTree_GUI as showTree_GUI
+from tkinter import SINGLE, END, Event, Tk, Canvas, Entry, Button, Listbox, Menu
 
 class FileSystem_GUI(Tk):
     def __init__(self):
@@ -34,7 +34,7 @@ class FileSystem_GUI(Tk):
         # Text area: Display
         textArea_Display = Listbox( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, selectmode=SINGLE, font="Arial 14" )
         textArea_Display.place( x=173.0, y=72.0, width=558.0, height=459.0 )
-        textArea_Display.bind("<Button-3>", self.__contentDisplayRightClick)
+        textArea_Display.bind("<Button-3>", lambda event: self.__contentDisplayRightClick(event, textArea_Display))
 
         self.__loadContentInFSDisplay(textArea_Display)
 
@@ -53,8 +53,33 @@ class FileSystem_GUI(Tk):
         button_5 = Button( text="Buscar", borderwidth=0, command=lambda: print("button_5 clicked"), relief="flat" )
         button_5.place( x=9.0, y=503.0, width=150.0, height=30.0 )
 
-    def __contentDisplayRightClick(self, event):
-        print(event)
+    def __contentDisplayRightClick(self, event, display: Listbox):
+
+        # Get the selected file/directory
+        try:
+            index = display.nearest(event.y)
+            display.select_clear(0, END)
+            display.selection_set( index )
+            selected_item = display.get( index )
+        except IndexError:
+            return
+
+        if len(selected_item) <= 0:
+            return
+
+        print(selected_item)
+
+        menu = Menu( tearoff=0 )
+        menu.add_command(label="Abrir", font="Arial 12")
+        menu.add_command(label="Eliminar", font="Arial 12")
+        menu.add_command(label="Copiar", font="Arial 12")
+        menu.add_command(label="Mover", font="Arial 12")
+        menu.add_command(label="Ver propiedades", font="Arial 12")
+
+        try:
+            menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            menu.grab_release()
 
     def __loadContentInFSDisplay(self, display: Listbox):
         # TODO: Gather files and folders
@@ -65,7 +90,7 @@ class FileSystem_GUI(Tk):
 
 
     def display_WindowShowTree(self):
-        window = window_ShowTree.Window_ShowTree(self)
+        window = showTree_GUI.Window_ShowTree(self)
         window.grab_set()
 
 if __name__ == "__main__":
