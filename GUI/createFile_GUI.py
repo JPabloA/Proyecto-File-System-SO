@@ -27,7 +27,10 @@ class CreateFile(Toplevel):
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_1.insert(0, "RUTA DEL ARCHIVO")
+        # To get the current directory absolute route
+        #self.entry_1.insert(0, parent.fileSystem.currentDirectory.name)
+        
+        self.entry_1.insert(0, "Nombre")
         self.entry_1.place(x=9.0, y=10.0, width=722.0, height=33.0)
 
         # Button: To save the content
@@ -49,8 +52,26 @@ class CreateFile(Toplevel):
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_2.insert("1.0", "TEXTO DEL ARCHIVO")
+        self.entry_2.insert("1.0", "Contenido")
         self.entry_2.place(x=171.0, y=67.0, width=558.0, height=459.0)
 
+    def getExtension(self, name):
+        parts = name.split(".")
+        if len(parts) > 1:
+            return parts[-1]
+        else:
+            print("Falta ingresar la extension de la vara de la vara")
+            return ""
+        
     def button_1_clicked(self):
+        name = self.entry_1.get()
+        extension = self.getExtension(name)
+        content = self.entry_2.get()
+        print("nombre ", name)
+        if extension != "":
+            print("\nextension ", extension)
+        else:
+            print("Falta de extension")
+        print("\ncontent", content)
+        #parent.fileSystem.createFile(name, extension, content)
         print("button_1 clicked")
