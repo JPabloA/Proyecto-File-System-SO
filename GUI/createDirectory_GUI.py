@@ -7,7 +7,7 @@ class CreateDirectory_GUI(Toplevel):
 
         self.parent = parent
 
-        self.title("Display Create Directory")
+        self.title("Create Directory")
         self.geometry("750x138")
         self.configure(bg = "#FFFFFF")
 
