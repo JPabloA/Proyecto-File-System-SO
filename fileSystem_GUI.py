@@ -123,12 +123,10 @@ class FileSystem_GUI(Tk):
             menu.grab_release()
 
     def __loadContentInFSDisplay(self, display: Listbox):
-
         print("Loading directories and files...")
         display.delete(0, "end")
 
-        # TODO: Gather files and folders
-        content = ["Carpeta1", "Carpeta2", "Carpeta3", "File1", "File2"]
+        content = self.fileSystem.listDirectory()
 
         for i in range(0, len(content)):
             display.insert(i, content[i])
