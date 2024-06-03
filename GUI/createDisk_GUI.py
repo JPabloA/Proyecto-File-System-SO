@@ -1,10 +1,10 @@
 from tkinter import Canvas, Entry, Button, Toplevel
 
-import src.FileSystem as FileSystem
-
 class CreateDisk_GUI(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+
+        self.parent = parent
 
         self.title("Display directory tree")
         self.geometry("750x267")
@@ -33,7 +33,5 @@ class CreateDisk_GUI(Toplevel):
         if not numSector.isnumeric() or not sectorSize.isnumeric():
             return
 
-        filesystem = FileSystem.FileSystem()
-        filesystem.create_disk( int(numSector), int(sectorSize) )
-
+        self.parent.fileSystem.create_disk( int(numSector), int(sectorSize) )
         self.destroy()

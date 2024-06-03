@@ -1,16 +1,30 @@
 from .file import File
 from .directory import Directory
 from .disk import Disk
+from .fat import FAT
 
 class FileSystem:
+
+    # Directory structure: { filename, FAT_index }
+
+    # FAT structure: [ ( sector_id, next_FAT_index ) ]
+    fat: FAT
+    disk: Disk | int
+
     def __init__(self):
         self.root = Directory("/root");
         self.currentDirectory = self.root
-        self.disk = None
+        self.disk = -2
+
+        self.fat = FAT()
+
+    def testing_printFAT(self):
+        self.fat.printFAT()
 
     def create_disk(self, sector_count, sector_size):
         self.disk = Disk(sector_count, sector_size)
         self.disk.createDisk()
+        self.fat.createTable( sector_count )
 
     def createFile(self, name, extension, content):
         if self.disk is None:
@@ -25,19 +39,22 @@ class FileSystem:
         #     raise ValueError ("Not enough space on disk.")
 
         newFile = File(name, extension, content)
-        start_sector = self.disk.writeToDisk(content)
+        sectors_list = self.disk.writeToDisk(content)
 
-        if start_sector == -1:
+        if len(sectors_list) == 0:
             raise ValueError("File couldnt be assing on disk - Not enough space on disk")
 
-        newFile.assignSectors([ start_sector ])
+        first_FAT_sector = self.fat.assingSectorList( sectors_list )
+
+        # File save the first sector
+        newFile.assignSectors( first_FAT_sector )
         self.currentDirectory.files[name] = newFile
         # to assign file sectors (Then we need to separate the function)
 
     def getCurrentWorkingDirectory(self):
         return self.currentDirectory.getDirectoryName()
 
-    def createDirectory(self,name):
+    def createDirectory(self, name):
         self.currentDirectory.createDirectory(name);
 
     # ? Los de movimiento van a ser todo un mundo (Pendiente)
