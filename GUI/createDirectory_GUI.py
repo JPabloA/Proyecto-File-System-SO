@@ -1,10 +1,13 @@
 from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
+from src.FileSystem import FileSystem
 
 class CreateDirectory_GUI(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.title("Display Create Directory")
+        self.parent = parent
+
+        self.title("Create Directory")
         self.geometry("750x138")
         self.configure(bg = "#FFFFFF")
 
@@ -18,17 +21,24 @@ class CreateDirectory_GUI(Toplevel):
             relief = "ridge"
         )
         canvas.place(x = 0, y = 0)
+        canvas.create_text( 9.0, 10.0, anchor="nw", text="Nombre del directorio:", fill="#000000", font=("Inter", 14) )
 
         # Text input: Directory path
-        entry_1 = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
-        entry_1.place( x=9.0, y=10.0, width=722.0, height=33.0 )
+        entry_1 = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, font="Arial 12" )
+        entry_1.place( x=9.0, y=35.0, width=722.0, height=25.0 )
 
         # Button: Crear
-        button_1 = Button( self, text="Crear", borderwidth=0, highlightthickness=0, command=lambda: print("button_1 clicked"), relief="flat" )
-        button_1.place( x=9.0, y=67.0, width=149.0, height=49.0 )
+        button_1 = Button( self, text="Crear", borderwidth=0, highlightthickness=0, command=lambda: self.__createDirectory( entry_1 ), relief="flat" )
+        button_1.place( x=9.0, y=75.0, width=149.0, height=49.0 )
 
-        # Text input: Directory path
-        entry_2 = Text( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
-        entry_2.place( x=171.0, y=67.0, width=558.0, height=47.0 )
-        
+    def __createDirectory(self, entry: Entry):
+        directory_name = entry.get().strip()
+
+        if len(directory_name) == 0:
+            return
+
+        self.parent.fileSystem.createDirectory( directory_name )
+        self.destroy()
+
+
 

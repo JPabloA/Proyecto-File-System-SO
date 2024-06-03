@@ -45,7 +45,7 @@ class FileSystem:
     #     self.currentDirectory =
 
     def listDirectory(self):
-        print(self.currentDirectory.listDirectory())
+        return self.currentDirectory.listDirectory()
 
     def removeFile(self, name):
         if name in self.currentDirectory.files:
