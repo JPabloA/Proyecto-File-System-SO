@@ -39,6 +39,9 @@ class Disk:
     # Private: Divide the content in string chunks of the size of a sector
     def __splitContentInChunks(self, content):
         content_chunks: list[str] = [content[i:i + self.__sector_size] for i in range(0, len(content), self.__sector_size)]
+        
+        # To remove line jump
+        content_chunks[-1] = content_chunks[-1].strip()
 
         # Fill the last sector with non-use space (Intern Fragmentation)
         content_chunks[-1] = content_chunks[-1].ljust(self.__sector_size, "0")
@@ -102,7 +105,7 @@ class Disk:
             for index, sector_id in enumerate(sectors_list):
                 if index < len(content_chunks):
                     sector_content = content_chunks[index]
-                    disk_list[sector_id] = f"{sector_id}:{sector_content}"
+                    disk_list[sector_id] = f"{sector_id}:{sector_content}\n"
                 else:
                     break
 

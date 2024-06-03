@@ -18,7 +18,7 @@ class FAT:
         table_index = 0
         sector_index = 0
 
-        table_entries_available = list(filter( lambda entry: entry[0] != -1, self.Table ))
+        table_entries_available = list(filter( lambda entry: entry[0] == -1, self.Table ))
 
         if len(sector_list) > len(table_entries_available):
             print("FAT: Space not available in the file allocation table")
@@ -26,7 +26,7 @@ class FAT:
 
         # Get the first available FAT entry
         for index, entry in enumerate(self.Table):
-            if entry[0] != -1:
+            if entry[0] == -1:
                 first_table_entry = index
                 break
 

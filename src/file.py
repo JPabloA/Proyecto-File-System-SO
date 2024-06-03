@@ -36,7 +36,7 @@ class File:
 
     # To assign file sectors
     def assignSectors(self, indicesSector):
-        self.sectors.extend(indicesSector)
+        self.sectors.append(indicesSector)
 
     # To release file sectors
     # TODO: falta limpiar bien la estructura que vayamos a utilizar para el disco

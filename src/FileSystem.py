@@ -9,12 +9,11 @@ class FileSystem:
 
     # FAT structure: [ ( sector_id, next_FAT_index ) ]
     fat: FAT
-    disk: Disk | int
-
+    disk: Disk | None
     def __init__(self):
         self.root = Directory("/root");
         self.currentDirectory = self.root
-        self.disk = -2
+        self.disk = None
 
         self.fat = FAT()
 
