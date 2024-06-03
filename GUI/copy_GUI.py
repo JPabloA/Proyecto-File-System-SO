@@ -1,4 +1,4 @@
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
+from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
 class CopyFiles(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)

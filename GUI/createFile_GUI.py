@@ -1,4 +1,4 @@
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
+from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
 
 class CreateFile(Toplevel):
     def __init__(self, parent):
