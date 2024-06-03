@@ -3,6 +3,7 @@ from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
 class CreateFile(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+        self.parent = parent
         self.title("Create File")
         self.geometry("750x550")
         self.configure(bg="#FFFFFF")
@@ -30,7 +31,7 @@ class CreateFile(Toplevel):
         # To get the current directory absolute route
         #self.entry_1.insert(0, parent.fileSystem.currentDirectory.name)
         
-        self.entry_1.insert(0, "Nombre")
+        self.entry_1.insert(0, "Nombre con extension (Por ejemplo: Archivo.txt)")
         self.entry_1.place(x=9.0, y=10.0, width=722.0, height=33.0)
 
         # Button: To save the content
@@ -39,7 +40,7 @@ class CreateFile(Toplevel):
             text = "Guardar",
             borderwidth=0,
             highlightthickness=0,
-            command=self.button_1_clicked,
+            command= lambda: self.createFile(),
             relief="flat"
         )
         self.button_1.place(x=9.0, y=67.0, width=149.0000762939453, height=49.0)
@@ -62,16 +63,23 @@ class CreateFile(Toplevel):
         else:
             print("Falta ingresar la extension de la vara de la vara")
             return ""
+    
+    def getName(self, name):
+        parts = name.split(".")
+        return parts[0]
+    
+    # TODO: Validaciones necesarias para asegurar que el nombre sea apto
+    def createFile(self):
+        print("entre")
+        fullName = self.entry_1.get()
         
-    def button_1_clicked(self):
-        name = self.entry_1.get()
-        extension = self.getExtension(name)
-        content = self.entry_2.get()
-        print("nombre ", name)
+        extension = self.getExtension(fullName)
+        fileName = self.getName(fullName)
+        content = self.entry_2.get("1.0", "end")
         if extension != "":
-            print("\nextension ", extension)
+            self.parent.fileSystem.createFile(fileName, extension, content)
+            self.destroy()
         else:
             print("Falta de extension")
-        print("\ncontent", content)
-        #parent.fileSystem.createFile(name, extension, content)
-        print("button_1 clicked")
+            
+
