@@ -3,6 +3,8 @@ from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
 class EditFile(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
+        
+        self.parent = parent
         self.title("Edit File")
         self.geometry("750x550")
         self.configure(bg="#FFFFFF")

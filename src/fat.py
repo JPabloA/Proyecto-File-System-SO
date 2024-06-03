@@ -53,4 +53,8 @@ class FAT:
 
         # Return the first table index
         return first_table_entry
-
+    
+    # TODO: Get indices of a file
+    # Funcion que retorne una lista de indices de todos los sectores que necesita un archivo
+    # Importante: Variable que tiene la info es Table linea 3 (Estructura)
+    
