@@ -57,8 +57,12 @@ class FileSystem:
         self.currentDirectory.createDirectory(name);
 
     # ? Los de movimiento van a ser todo un mundo (Pendiente)
-    # def changeDirectory(self, name):
-    #     self.currentDirectory =
+    def changeDirectory(self, name):
+        try:
+            selectedDirectory: Directory = self.currentDirectory.directories[ name ]
+            self.currentDirectory = selectedDirectory
+        except:
+           print("No es directorio o no se logró reconocer bien")
 
     def listDirectory(self):
         return self.currentDirectory.listDirectory()
