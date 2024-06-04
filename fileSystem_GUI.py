@@ -14,6 +14,11 @@ class FileSystem_GUI(Tk):
 
     fileSystem: FileSystem
 
+    # Global class variables
+    textInput_DirectoryPath: Entry
+    textInput_SearchBar: Entry
+    textArea_Display: Listbox
+
     def __init__(self):
         super().__init__()
 
@@ -39,25 +44,25 @@ class FileSystem_GUI(Tk):
         canvas.create_text( 9, 445.0, anchor="nw", text="Buscador", fill="#000000", font=("Inter", 13 * -1) )
 
         # Text input: Directory path
-        textInput_DirectoryPath = Entry( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, font=("Inter", 14))
-        textInput_DirectoryPath.place( x=54.0, y=11.0, width=622.0, height=35.0 )
+        self.textInput_DirectoryPath = Entry( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, font=("Inter", 14))
+        self.textInput_DirectoryPath.place( x=54.0, y=11.0, width=622.0, height=35.0 )
 
-        self.__loadCurrentWorkingDirectory(textInput_DirectoryPath)
+        self.__loadCurrentWorkingDirectory()
 
         # Text input: Search bar
-        textInput_SearchBar = Entry( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
-        textInput_SearchBar.place( x=9.0, y=465.0, width=150.0, height=30.0 )
+        self.textInput_SearchBar = Entry( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
+        self.textInput_SearchBar.place( x=9.0, y=465.0, width=150.0, height=30.0 )
 
         # Text area: Display
-        textArea_Display = Listbox( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, selectmode=SINGLE, font="Arial 14" )
-        textArea_Display.place( x=173.0, y=72.0, width=558.0, height=459.0 )
-        textArea_Display.bind("<Button-3>", lambda event: self.__contentDisplayRightClick(event, textArea_Display))
-        textArea_Display.bind("<Double-Button-1>", self.__onFSDoubleClick)
+        self.textArea_Display = Listbox( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, selectmode=SINGLE, font="Arial 14" )
+        self.textArea_Display.place( x=173.0, y=72.0, width=558.0, height=459.0 )
+        self.textArea_Display.bind("<Button-3>", lambda event: self.__contentDisplayRightClick(event))
+        self.textArea_Display.bind("<Double-Button-1>", self.__onFSDoubleClick)
 
-        self.__loadContentInFSDisplay(textArea_Display)
+        self.__loadContentInFSDisplay()
 
         # Button: Refresh display directory
-        button_UpdateDirectory = Button( text="↺", command=lambda: self.__loadContentInFSDisplay(textArea_Display) , relief="flat", font="Arial 16" )
+        button_UpdateDirectory = Button( text="↺", command=lambda: self.__loadContentInFSDisplay() , relief="flat", font="Arial 16" )
         button_UpdateDirectory.place( x=696.0, y=11.0, width=35.0, height=35.0 )
 
         # Button: Go 1 directory back
@@ -86,25 +91,28 @@ class FileSystem_GUI(Tk):
             index = selection[0]
             value = widget.get(index)
 
-            if "Carpeta" in value:
+            if "[DIR]" in value:
+                self.fileSystem.changeDirectory( value.split("[DIR] ")[1] )
+                self.__loadCurrentWorkingDirectory()
+                self.__loadContentInFSDisplay()
                 print("Abriendo carpeta...")
             else:
                 print("Abriendo archivo...")
 
-    def __loadCurrentWorkingDirectory(self, path_field: Entry):
+    def __loadCurrentWorkingDirectory(self):
         cwd = self.fileSystem.getCurrentWorkingDirectory()
 
-        path_field.config(state="normal")
-        path_field.insert(0, cwd)
-        path_field.config(state="disabled")
+        self.textInput_DirectoryPath.config(state="normal")
+        self.textInput_DirectoryPath.insert(0, cwd)
+        self.textInput_DirectoryPath.config(state="disabled")
 
-    def __contentDisplayRightClick(self, event, display: Listbox):
+    def __contentDisplayRightClick(self, event):
         # Get the selected file/directory
         try:
-            index = display.nearest(event.y)
-            display.select_clear(0, END)
-            display.selection_set( index )
-            selected_item = display.get( index )
+            index = self.textArea_Display.nearest(event.y)
+            self.textArea_Display.select_clear(0, END)
+            self.textArea_Display.selection_set( index )
+            selected_item = self.textArea_Display.get( index )
         except IndexError:
             return
 
@@ -126,14 +134,14 @@ class FileSystem_GUI(Tk):
         finally:
             menu.grab_release()
 
-    def __loadContentInFSDisplay(self, display: Listbox):
+    def __loadContentInFSDisplay(self):
         print("Loading directories and files...")
-        display.delete(0, "end")
+        self.textArea_Display.delete(0, "end")
 
         content = self.fileSystem.listDirectory()
 
         for i in range(0, len(content)):
-            display.insert(i, content[i])
+            self.textArea_Display.insert(i, content[i])
 
     def display_CreateDirectory_GUI(self):
         window = createDirectory_GUI.CreateDirectory_GUI(self)
