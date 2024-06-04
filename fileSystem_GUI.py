@@ -40,7 +40,7 @@ class FileSystem_GUI(Tk):
 
         # Text input: Directory path
         textInput_DirectoryPath = Entry( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, font=("Inter", 14))
-        textInput_DirectoryPath.place( x=9.0, y=11.0, width=667.0, height=37.0 )
+        textInput_DirectoryPath.place( x=54.0, y=11.0, width=622.0, height=35.0 )
 
         self.__loadCurrentWorkingDirectory(textInput_DirectoryPath)
 
@@ -59,6 +59,10 @@ class FileSystem_GUI(Tk):
         # Button: Refresh display directory
         button_UpdateDirectory = Button( text="↺", command=lambda: self.__loadContentInFSDisplay(textArea_Display) , relief="flat", font="Arial 16" )
         button_UpdateDirectory.place( x=696.0, y=11.0, width=35.0, height=35.0 )
+
+        # Button: Go 1 directory back
+        button_GoBack = Button( text="←", command=lambda: print("Go back") , relief="flat", font="Arial 16" )
+        button_GoBack.place( x=9.0, y=11.0, width=35.0, height=35.0 )
 
         button_1 = Button( text="Crear Disco", command=self.display_CreateDisk_GUI, relief="flat" )
         button_1.place( x=9.0, y=72.0, width=150.0, height=35.0 )
