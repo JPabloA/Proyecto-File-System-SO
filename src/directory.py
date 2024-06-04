@@ -6,6 +6,7 @@ class Directory:
     def __init__(self, name):
         self.name = name
         self.creationDate = datetime.datetime.now()
+        self.parent_directory = None
         self.files = {}
         self.directories = {}
 
@@ -16,11 +17,14 @@ class Directory:
         newFile = File(fileName, fileExtension, fileContent)
         self.files[fileName] = newFile
 
-    def createDirectory (self, directoryName):
+    def createDirectory (self, directoryName: str, parent_directory):
         if directoryName in self.files or directoryName in self.directories:
             raise ValueError("A file or directory with this name already exists.")
+
         newDirectory = Directory(directoryName)
-        self.directories[directoryName] = newDirectory;
+        newDirectory.parent_directory = parent_directory
+
+        self.directories[directoryName] = newDirectory
 
     def getDirectoryName(self):
         return self.name
