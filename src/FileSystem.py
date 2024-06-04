@@ -32,12 +32,6 @@ class FileSystem:
         if name in self.currentDirectory.files:
             raise ValueError("Another file with the same name.")
 
-
-        #!: Validacion de espacio disponible (Antes de crear el archivo)
-        # required_sectors = (len(content) + self.disk.__sector_size - 1)
-        # if len(self.disk.__free_sectors) < required_sectors:
-        #     raise ValueError ("Not enough space on disk.")
-
         newFile = File(name, extension, content)
         sectors_list = self.disk.writeToDisk(content)
 
@@ -49,35 +43,48 @@ class FileSystem:
         # File save the first sector
         newFile.assignSectors( first_FAT_sector )
         self.currentDirectory.files[name] = newFile
-        # to assign file sectors (Then we need to separate the function)
 
     def getCurrentWorkingDirectory(self):
         # return self.currentDirectory.getDirectoryName()
         return self.path
 
     def createDirectory(self, name):
-        self.currentDirectory.createDirectory(name);
+        self.currentDirectory.createDirectory(name, self.currentDirectory)
 
-    # ? Los de movimiento van a ser todo un mundo (Pendiente)
-    def changeDirectory(self, selected_path: str):
+    # ? Versión No usada
+    # def changeDirectory_versionRecorrerLista(self, selected_path: str):
+    #     try:
+    #         # Path string
+    #         new_path = "/root"
+    #         # Split the path into directories (Skip empty space and root)
+    #         directories = selected_path.split("/")[2:]
+
+    #         # Go throught all directories until reach the last directory
+    #         selectedDirectory: Directory = self.root
+    #         for d_name in directories:
+    #             selectedDirectory = selectedDirectory.directories[ d_name ]
+    #             new_path += f"/{d_name}"
+
+    #         print( selectedDirectory.name )
+    #         print( new_path )
+
+    #         self.currentDirectory = selectedDirectory
+    #         self.path = new_path
+    #     except:
+    #         # TODO: Pasar a messageBox
+    #        print("No es directorio o no se logró reconocer bien")
+
+    def changeDirectory(self, directory_name: str, goBack: bool = False):
         try:
-            # Path string
-            new_path = "/root"
-            # Split the path into directories (Skip empty space and root)
-            directories = selected_path.split("/")[2:]
-
-            # Go throught all directories until reach the last directory
-            selectedDirectory: Directory = self.root
-            for d_name in directories:
-                selectedDirectory = selectedDirectory.directories[ d_name ]
-                new_path += f"/{d_name}"
-
-            print( selectedDirectory.name )
-            print( new_path )
-
-            self.currentDirectory = selectedDirectory
-            self.path = new_path
+            if goBack and self.currentDirectory.parent_directory != None:
+                self.path = self.path.rsplit("/", 1)[0]
+                self.currentDirectory = self.currentDirectory.parent_directory
+            elif not goBack:
+                selected_directory: Directory = self.currentDirectory.directories[ directory_name ]
+                self.path += f"/{directory_name}"
+                self.currentDirectory = selected_directory
         except:
+           # TODO: Pasar a messageBox
            print("No es directorio o no se logró reconocer bien")
 
     def listDirectory(self):

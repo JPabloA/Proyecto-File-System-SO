@@ -86,12 +86,11 @@ class FileSystem_GUI(Tk):
 
     def __goBackDirectory(self):
         current_path = self.fileSystem.getCurrentWorkingDirectory()
-        current_path = current_path.rsplit("/", 1)[0]
+        current_directory = current_path.rsplit("/", 1)[-1]
 
-        if len(current_path) != 0:
-            self.fileSystem.changeDirectory ( current_path )
-            self.__loadCurrentWorkingDirectory()
-            self.__loadContentInFSDisplay()
+        self.fileSystem.changeDirectory ( current_directory, True )
+        self.__loadCurrentWorkingDirectory()
+        self.__loadContentInFSDisplay()
 
     def __onFSDoubleClick(self, event):
         widget = event.widget
@@ -102,9 +101,8 @@ class FileSystem_GUI(Tk):
 
             if "[DIR]" in value:
                 directory_name = value.split("[DIR] ")[1]
-                desired_path = self.fileSystem.getCurrentWorkingDirectory() + f"/{directory_name}"
 
-                self.fileSystem.changeDirectory( desired_path )
+                self.fileSystem.changeDirectory( directory_name )
                 self.__loadCurrentWorkingDirectory()
                 self.__loadContentInFSDisplay()
                 print("Abriendo carpeta...")
@@ -132,9 +130,6 @@ class FileSystem_GUI(Tk):
         if len(selected_item) <= 0:
             return
 
-        print(selected_item)
-        print("PRUEBA")
-
         menu = Menu( tearoff=0 )
         menu.add_command(label="Abrir", font="Arial 12", command=self.display_EditFile_GUI)
         menu.add_command(label="Eliminar", font="Arial 12")
@@ -148,7 +143,6 @@ class FileSystem_GUI(Tk):
             menu.grab_release()
 
     def __loadContentInFSDisplay(self):
-        print("Loading directories and files...")
         self.textArea_Display.delete(0, "end")
 
         content = self.fileSystem.listDirectory()
@@ -159,6 +153,7 @@ class FileSystem_GUI(Tk):
     def display_CreateDirectory_GUI(self):
         window = createDirectory_GUI.CreateDirectory_GUI(self)
         window.grab_set()
+        self.__loadContentInFSDisplay()
 
     def display_WindowShowTree(self):
         window = showTree_GUI.ShowTree_GUI(self)
@@ -180,14 +175,14 @@ class FileSystem_GUI(Tk):
     def display_Copy_GUI(self):
         window = copy_GUI.CopyFiles(self)
         window.grab_set()
-    
+
     def display_CreateFile_GUI(self):
         window = createFile_GUI.CreateFile(self)
         window.grab_set()
-    
+
     def display_EditFile_GUI(self):
         window = editFile_GUI.EditFile(self)
-        window.grab_set()       
+        window.grab_set()
 
 if __name__ == "__main__":
     app = FileSystem_GUI()
