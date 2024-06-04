@@ -26,11 +26,6 @@ class FileSystem:
         self.fat.createTable( sector_count )
 
     def createFile(self, name, extension, content):
-        if self.disk is None:
-            raise ValueError("No disk created.")
-        if name in self.currentDirectory.files:
-            raise ValueError("Another file with the same name.")
-
 
         #!: Validacion de espacio disponible (Antes de crear el archivo)
         # required_sectors = (len(content) + self.disk.__sector_size - 1)

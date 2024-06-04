@@ -1,4 +1,4 @@
-from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
+from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel, messagebox
 
 class CreateFile(Toplevel):
     def __init__(self, parent):
@@ -68,13 +68,32 @@ class CreateFile(Toplevel):
         parts = name.split(".")
         return parts[0]
     
+    def diskVerification(self):
+        if not self.parent.fileSystem.disk == None:
+            return True
+        messagebox.showwarning("Disco no encontrado","Disco no creado. Favor crear un disco antes de intentar crear un archivo")
+        return False
+        
+    
+    def uniqueFileNameVerification(self, fileName):
+        if not fileName in self.parent.fileSystem.currentDirectory.files:
+            return True
+        messagebox.showwarning("Archivo con mismo nombre","Se ha encontrado un archivo con el mismo nombre. Favor ingresar un nombre diferente al archivo.")
+        return False
+            
     # TODO: Validaciones necesarias para asegurar que el nombre sea apto
     def createFile(self):
-        print("entre")
-        fullName = self.entry_1.get()
+        # Disk verification
+        if not self.diskVerification():
+            return
         
-        extension = self.getExtension(fullName)
+        # Name verification
+        fullName = self.entry_1.get()
         fileName = self.getName(fullName)
+        if not self.uniqueFileNameVerification(fileName):
+            return
+        extension = self.getExtension(fullName)
+
         content = self.entry_2.get("1.0", "end")
         if extension != "":
             self.parent.fileSystem.createFile(fileName, extension, content)
