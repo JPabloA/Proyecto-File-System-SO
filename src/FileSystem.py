@@ -11,7 +11,8 @@ class FileSystem:
     fat: FAT
     disk: Disk | None
     def __init__(self):
-        self.root = Directory("/root");
+        self.path = "/root"
+        self.root = Directory( self.path );
         self.currentDirectory = self.root
         self.disk = None
 
@@ -51,16 +52,31 @@ class FileSystem:
         # to assign file sectors (Then we need to separate the function)
 
     def getCurrentWorkingDirectory(self):
-        return self.currentDirectory.getDirectoryName()
+        # return self.currentDirectory.getDirectoryName()
+        return self.path
 
     def createDirectory(self, name):
         self.currentDirectory.createDirectory(name);
 
     # ? Los de movimiento van a ser todo un mundo (Pendiente)
-    def changeDirectory(self, name):
+    def changeDirectory(self, selected_path: str):
         try:
-            selectedDirectory: Directory = self.currentDirectory.directories[ name ]
+            # Path string
+            new_path = "/root"
+            # Split the path into directories (Skip empty space and root)
+            directories = selected_path.split("/")[2:]
+
+            # Go throught all directories until reach the last directory
+            selectedDirectory: Directory = self.root
+            for d_name in directories:
+                selectedDirectory = selectedDirectory.directories[ d_name ]
+                new_path += f"/{d_name}"
+
+            print( selectedDirectory.name )
+            print( new_path )
+
             self.currentDirectory = selectedDirectory
+            self.path = new_path
         except:
            print("No es directorio o no se logró reconocer bien")
 

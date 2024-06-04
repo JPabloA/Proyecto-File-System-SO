@@ -66,7 +66,7 @@ class FileSystem_GUI(Tk):
         button_UpdateDirectory.place( x=696.0, y=11.0, width=35.0, height=35.0 )
 
         # Button: Go 1 directory back
-        button_GoBack = Button( text="←", command=lambda: print("Go back") , relief="flat", font="Arial 16" )
+        button_GoBack = Button( text="←", command=self.__goBackDirectory , relief="flat", font="Arial 16" )
         button_GoBack.place( x=9.0, y=11.0, width=35.0, height=35.0 )
 
         button_1 = Button( text="Crear Disco", command=self.display_CreateDisk_GUI, relief="flat" )
@@ -84,6 +84,15 @@ class FileSystem_GUI(Tk):
         button_5 = Button( text="Buscar", borderwidth=0, command=lambda: print("button_5 clicked"), relief="flat" )
         button_5.place( x=9.0, y=503.0, width=150.0, height=30.0 )
 
+    def __goBackDirectory(self):
+        current_path = self.fileSystem.getCurrentWorkingDirectory()
+        current_path = current_path.rsplit("/", 1)[0]
+
+        if len(current_path) != 0:
+            self.fileSystem.changeDirectory ( current_path )
+            self.__loadCurrentWorkingDirectory()
+            self.__loadContentInFSDisplay()
+
     def __onFSDoubleClick(self, event):
         widget = event.widget
         selection = widget.curselection()
@@ -92,7 +101,10 @@ class FileSystem_GUI(Tk):
             value = widget.get(index)
 
             if "[DIR]" in value:
-                self.fileSystem.changeDirectory( value.split("[DIR] ")[1] )
+                directory_name = value.split("[DIR] ")[1]
+                desired_path = self.fileSystem.getCurrentWorkingDirectory() + f"/{directory_name}"
+
+                self.fileSystem.changeDirectory( desired_path )
                 self.__loadCurrentWorkingDirectory()
                 self.__loadContentInFSDisplay()
                 print("Abriendo carpeta...")
@@ -103,6 +115,7 @@ class FileSystem_GUI(Tk):
         cwd = self.fileSystem.getCurrentWorkingDirectory()
 
         self.textInput_DirectoryPath.config(state="normal")
+        self.textInput_DirectoryPath.delete(0, END)
         self.textInput_DirectoryPath.insert(0, cwd)
         self.textInput_DirectoryPath.config(state="disabled")
 
