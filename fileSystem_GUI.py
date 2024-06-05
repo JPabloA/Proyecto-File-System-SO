@@ -81,7 +81,7 @@ class FileSystem_GUI(Tk):
         button_4 = Button( text="Desp. Árbol", borderwidth=0, command=self.display_WindowShowTree, relief="flat" )
         button_4.place( x=9.0, y=213.0, width=150.0, height=35.0 )
 
-        button_5 = Button( text="Buscar", borderwidth=0, command=lambda: print("button_5 clicked"), relief="flat" )
+        button_5 = Button( text="Buscar", borderwidth=0, command=self.__onSearchRequest, relief="flat" )
         button_5.place( x=9.0, y=503.0, width=150.0, height=30.0 )
 
     def __goBackDirectory(self):
@@ -100,7 +100,8 @@ class FileSystem_GUI(Tk):
             value = widget.get(index)
 
             if "[DIR]" in value:
-                directory_name = value.split("[DIR] ")[1]
+                directory_name: str = value.split("[DIR] ")[1]
+                directory_name = directory_name.rsplit( "/", 1 )[-1]
 
                 self.fileSystem.changeDirectory( directory_name )
                 self.__loadCurrentWorkingDirectory()
@@ -142,13 +143,21 @@ class FileSystem_GUI(Tk):
         finally:
             menu.grab_release()
 
-    def __loadContentInFSDisplay(self):
+    def __loadContentInFSDisplay(self, search_result: list = []):
         self.textArea_Display.delete(0, "end")
 
-        content = self.fileSystem.listDirectory()
+        content = self.fileSystem.listDirectory() if len(search_result) == 0 else search_result
 
         for i in range(0, len(content)):
             self.textArea_Display.insert(i, content[i])
+
+    def __onSearchRequest(self):
+        search_value = self.textInput_SearchBar.get()
+        if len(search_value) == 0:
+            return
+
+        search_result = self.fileSystem.findElement(search_value)
+        self.__loadContentInFSDisplay( search_result )
 
     def display_CreateDirectory_GUI(self):
         window = createDirectory_GUI.CreateDirectory_GUI(self)

@@ -6,7 +6,6 @@ class Directory:
     def __init__(self, name):
         self.name = name
         self.creationDate = datetime.datetime.now()
-        self.parent_directory = None
         self.files = {}
         self.directories = {}
 
@@ -17,13 +16,11 @@ class Directory:
         newFile = File(fileName, fileExtension, fileContent)
         self.files[fileName] = newFile
 
-    def createDirectory (self, directoryName: str, parent_directory):
+    def createDirectory (self, directoryName: str):
         if directoryName in self.files or directoryName in self.directories:
             raise ValueError("A file or directory with this name already exists.")
 
         newDirectory = Directory(directoryName)
-        newDirectory.parent_directory = parent_directory
-
         self.directories[directoryName] = newDirectory
 
     def getDirectoryName(self):
@@ -33,8 +30,8 @@ class Directory:
         contentList = []
         for dirName in self.directories:
             contentList.append(f"[DIR] {dirName}")
-        for fileName in self.files:
-            contentList.append(f"[FILE] {fileName}")
+        for file in self.files.values():
+            contentList.append(f"[FILE] {file.name}.{file.extension}")
         return contentList
 
     def remove_file(self, name):
@@ -51,20 +48,20 @@ class Directory:
         else:
             raise ValueError("Directory not found.")
 
-    # TODO: Move and Find element
+    # TODO: Move element
 
-    # ? find siempre va desde la raiz (Por el momento la implementacion esta unicmanete desde la raiz y no desde el punto actual)
-    # TODO: Hace falta meterle tambien la parte de busqueda por extension????
-    def findElement(self, name):
-        foundPaths = []
+    def findFiles(self, name: str) -> list[str]:
+        search_result = []
 
-        # Archivos del directorio actual
-        if name in self.files:
-            foundPaths.append(f"{self.name}/{name}")
+        for file in self.files.values():
+            fullFile_name = f"{file.name}.{file.extension}"
+            if name in fullFile_name:
+                search_result.append(f"{file.name}.{file.extension}")
 
-        # Directorios del directorio actual
-        for dirName,subdir in self.directories:
-            if dirName == name:
-                foundPaths.append(f"{self.name}/{dirName}")
-            # Parte recursiva
-            foundPaths += subdir.findElement(name)
+        return search_result
+
+    def getFiles(self):
+        return self.files
+
+    def getDirectories(self):
+        return self.directories
