@@ -9,7 +9,7 @@ class File:
         self.creationDate = datetime.datetime.now()
         self.modificationDate = datetime.datetime.now()
         self.size = len(content)
-        self.sectors = []
+        self.fat_index: int = -1
 
     # Functions
 
@@ -35,13 +35,11 @@ class File:
             }
 
     # To assign file sectors
-    def assignSectors(self, indicesSector):
-        self.sectors.append(indicesSector)
+    def assignSectors(self, starting_index):
+        self.fat_index = starting_index
 
     # To release file sectors
     # TODO: falta limpiar bien la estructura que vayamos a utilizar para el disco
     def releaseSectors(self):
-        sectors = self.sectors
-        self.sectors = []
-        return sectors
+        return -1
 
