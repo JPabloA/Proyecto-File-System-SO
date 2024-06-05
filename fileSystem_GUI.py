@@ -101,9 +101,9 @@ class FileSystem_GUI(Tk):
 
             if "[DIR]" in value:
                 directory_name: str = value.split("[DIR] ")[1]
-                directory_name = directory_name.rsplit( "/", 1 )[-1]
+                desired_path = self.fileSystem.getCurrentWorkingDirectory() + f"/{directory_name}"
 
-                self.fileSystem.changeDirectory( directory_name )
+                self.fileSystem.changeDirectory( desired_path )
                 self.__loadCurrentWorkingDirectory()
                 self.__loadContentInFSDisplay()
                 print("Abriendo carpeta...")
