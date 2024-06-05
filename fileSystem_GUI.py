@@ -6,7 +6,7 @@ import GUI.createDisk_GUI as createDisk_GUI
 import GUI.copy_GUI as copy_GUI
 import GUI.createFile_GUI as createFile_GUI
 import GUI.editFile_GUI as editFile_GUI
-from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu
+from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu, messagebox
 
 from src.FileSystem import FileSystem
 
@@ -134,7 +134,7 @@ class FileSystem_GUI(Tk):
 
         menu = Menu( tearoff=0 )
         menu.add_command(label="Abrir", font="Arial 12", command=self.display_EditFile_GUI)
-        menu.add_command(label="Eliminar", font="Arial 12")
+        menu.add_command(label="Eliminar", font="Arial 12", command = self.deleteFunction)
         menu.add_command(label="Copiar", font="Arial 12", command=self.display_Copy_GUI)
         menu.add_command(label="Mover", font="Arial 12", command=self.display_Move_GUI)
         menu.add_command(label="Ver propiedades", font="Arial 12", command=self.display_seeProperties)
@@ -194,6 +194,16 @@ class FileSystem_GUI(Tk):
         window = editFile_GUI.EditFile(self)
         window.grab_set()
 
+    def deleteFunction(self):
+        
+        #verificacion y messagebox de si el archivo existe, tomar en cuenta que depende la operacion a realizar depende del tipo (Entonces primero debemos de sacar el tipo para luego proceder a eliminar)
+        if messagebox.askyesno("Eliminar","¿Estás seguro que deseas eliminar este archivo/directorio?"):
+            #Codigo que en caso de que el usuario presione que si
+            print("Eliminando el directorio/archivo")
+        else:
+            print ("Cancelando eliminacion")
+        
+        
 if __name__ == "__main__":
     app = FileSystem_GUI()
 
