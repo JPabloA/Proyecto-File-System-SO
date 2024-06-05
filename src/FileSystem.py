@@ -28,11 +28,6 @@ class FileSystem:
 
     def createFile(self, name, extension, content):
 
-        #!: Validacion de espacio disponible (Antes de crear el archivo)
-        # required_sectors = (len(content) + self.disk.__sector_size - 1)
-        # if len(self.disk.__free_sectors) < required_sectors:
-        #     raise ValueError ("Not enough space on disk.")
-
         newFile = File(name, extension, content)
         sectors_list = self.disk.writeToDisk(content)
 
