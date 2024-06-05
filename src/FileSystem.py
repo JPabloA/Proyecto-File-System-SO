@@ -65,9 +65,6 @@ class FileSystem:
                 selectedDirectory = selectedDirectory.directories[ d_name ]
                 new_path += f"/{d_name}"
 
-            print( selectedDirectory.name )
-            print( new_path )
-
             self.currentDirectory = selectedDirectory
             self.path = new_path
         except:
