@@ -35,6 +35,7 @@ class FileSystem:
         newFile = File(name, extension, content)
         sectors_list = self.disk.writeToDisk(content)
 
+        # Validacion sacarla a una nueva funcion por cuestiones de GUI
         if len(sectors_list) == 0:
             raise ValueError("File couldnt be assing on disk - Not enough space on disk")
 
@@ -65,6 +66,8 @@ class FileSystem:
                 self.disk.__free_sectors.append(sectorIndex)
                 #! here we write in disk
         else:
+            # actualmente chambeando en este
+            # me parece que remove remove no deberia de tener valida (Tal vez si para cuando no se ha refrescado)
             raise ValueError ("File not found.")
 
     # TODO: Arreglar el borrado de los directorios (Recordar que deben de ser recursivos y volarse todo directorio o archivo que este dentro de el)

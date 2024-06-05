@@ -37,14 +37,17 @@ class Directory:
         if name in self.files:
             del self.files[name]
         else:
+            # Se debe abarcar en GUI
             raise ValueError("File not found.")
 
     def remove_directory(self, name):
         if name in self.directories:
+            # Lo mejor seria sacar la validacion de si esta vacio en una nueva funcion que retorne si esta vacia o no (Funcional para el messagebox en GUI)
             if self.directories[name].directories or self.directories[name].files:
                 raise ValueError("Directory is not empty.")
             del self.directories[name]
         else:
+            # Me parece que se abarca en la GUI
             raise ValueError("Directory not found.")
 
     # TODO: Move and Find element
