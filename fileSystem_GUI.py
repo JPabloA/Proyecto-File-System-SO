@@ -86,11 +86,12 @@ class FileSystem_GUI(Tk):
 
     def __goBackDirectory(self):
         current_path = self.fileSystem.getCurrentWorkingDirectory()
-        current_directory = current_path.rsplit("/", 1)[-1]
+        current_path = current_path.rsplit("/", 1)[0]
 
-        self.fileSystem.changeDirectory ( current_directory, True )
-        self.__loadCurrentWorkingDirectory()
-        self.__loadContentInFSDisplay()
+        if len(current_path) != 0:
+            self.fileSystem.changeDirectory ( current_path )
+            self.__loadCurrentWorkingDirectory()
+            self.__loadContentInFSDisplay()
 
     def __onFSDoubleClick(self, event):
         widget = event.widget
@@ -101,7 +102,7 @@ class FileSystem_GUI(Tk):
 
             if "[DIR]" in value:
                 directory_name: str = value.split("[DIR] ")[1]
-                desired_path = self.fileSystem.getCurrentWorkingDirectory() + f"/{directory_name}"
+                desired_path = directory_name if "/" in directory_name else self.fileSystem.getCurrentWorkingDirectory() + f"/{directory_name}"
 
                 self.fileSystem.changeDirectory( desired_path )
                 self.__loadCurrentWorkingDirectory()
