@@ -9,6 +9,8 @@ import GUI.editFile_GUI as editFile_GUI
 from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu, messagebox
 
 from src.FileSystem import FileSystem
+from src.file import File
+from src.directory import Directory
 
 class FileSystem_GUI(Tk):
 
@@ -113,7 +115,7 @@ class FileSystem_GUI(Tk):
                 fileObj = self.getFileObj(fileName)
                 content = self.getFileContent(fileObj)
                 self.display_EditFile_GUI(fileObj, content)
-                
+
 
     def __loadCurrentWorkingDirectory(self):
         cwd = self.fileSystem.getCurrentWorkingDirectory()
@@ -129,17 +131,26 @@ class FileSystem_GUI(Tk):
             index = self.textArea_Display.nearest(event.y)
             self.textArea_Display.select_clear(0, END)
             self.textArea_Display.selection_set( index )
-            selected_item = self.textArea_Display.get( index )
+            selected_item: str = self.textArea_Display.get( index )
         except IndexError:
             return
 
         if len(selected_item) <= 0:
             return
 
+        selected_obj: File | Directory
+
+        if "[FILE]" in selected_item:
+            selected_item = selected_item.split("[FILE] ")[-1]
+            selected_obj = self.getFileObj( selected_item )
+        elif "[DIR]" in selected_item:
+            selected_item = selected_item.split("[DIR] ")[-1]
+            selected_obj = self.getDirectoryObj( selected_item )
+
         menu = Menu( tearoff=0 )
         menu.add_command(label="Abrir", font="Arial 12", command=self.display_EditFile_GUI)
         menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_item ))
-        menu.add_command(label="Copiar", font="Arial 12", command=self.display_Copy_GUI)
+        menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( selected_obj ))
         menu.add_command(label="Mover", font="Arial 12", command=self.display_Move_GUI)
         menu.add_command(label="Ver propiedades", font="Arial 12", command=self.display_seeProperties)
 
@@ -165,7 +176,6 @@ class FileSystem_GUI(Tk):
         self.__loadContentInFSDisplay( search_result )
 
     def __deleteFunction(self, selected_item: str):
-
         #verificacion y messagebox de si el archivo existe, tomar en cuenta que depende la operacion a realizar depende del tipo (Entonces primero debemos de sacar el tipo para luego proceder a eliminar)
         if messagebox.askyesno("Eliminar","¿Estás seguro que deseas eliminar este archivo/directorio?"):
             print("Eliminando el directorio/archivo")
@@ -204,9 +214,9 @@ class FileSystem_GUI(Tk):
         window = seeProperties_GUI.SeeProperties_GUI(self)
         window.grab_set()
 
-    # TODO: Verify if they work correctly (These 3 functions)
-    def display_Copy_GUI(self):
-        window = copy_GUI.CopyFiles(self)
+    def display_Copy_GUI(self, selected_obj: File | Directory):
+        print("antes de abrir", selected_obj)
+        window = copy_GUI.CopyFiles(self, selected_obj)
         window.grab_set()
 
     def display_CreateFile_GUI(self):
@@ -216,31 +226,39 @@ class FileSystem_GUI(Tk):
     def display_EditFile_GUI(self, fileObj, content):
         window = editFile_GUI.EditFile(self, fileObj, content)
         window.deiconify()
-        window.update_idletasks() 
+        window.update_idletasks()
         window.grab_set()
 
     def deleteFunction(self):
-        
         #verificacion y messagebox de si el archivo existe, tomar en cuenta que depende la operacion a realizar depende del tipo (Entonces primero debemos de sacar el tipo para luego proceder a eliminar)
         if messagebox.askyesno("Eliminar","¿Estás seguro que deseas eliminar este archivo/directorio?"):
             #Codigo que en caso de que el usuario presione que si
             print("Eliminando el directorio/archivo")
         else:
             print ("Cancelando eliminacion")
-    
+
     def getFileContent(self, fileObj):
         return self.fileSystem.getFileContent(fileObj)
 
-    
+
     def getFileObj(self,fileName):
         if fileName in self.fileSystem.currentDirectory.files:
             fileObj = self.fileSystem.currentDirectory.files[fileName]
         else:
             messagebox.showwarning("Este archivo no existe")
             return None
-        
+
         return fileObj
-    
+
+    def getDirectoryObj(self, dirName: str):
+        if dirName in self.fileSystem.currentDirectory.directories:
+            dirObj = self.fileSystem.currentDirectory.directories[ dirName ]
+        else:
+            messagebox.showwarning("Este directorio no existe")
+            return None
+
+        return dirObj
+
 if __name__ == "__main__":
     app = FileSystem_GUI()
 
