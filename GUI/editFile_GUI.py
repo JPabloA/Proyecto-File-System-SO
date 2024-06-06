@@ -1,9 +1,10 @@
-from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
+from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel, messagebox
 from src.file import File
 class EditFile(Toplevel):
     def __init__(self, parent, fileObj: File, content):
         super().__init__(parent)
         
+        self.file = fileObj
         self.parent = parent
         self.title("Edit File")
         self.geometry("750x550")
@@ -39,7 +40,7 @@ class EditFile(Toplevel):
             text = "Guardar",
             borderwidth=0,
             highlightthickness=0,
-            command=self.button_1_clicked,
+            command=self.saveButton,
             relief="flat"
         )
         self.button_1.place(x=9.0, y=67.0, width=149.0000762939453, height=49.0)
@@ -55,5 +56,63 @@ class EditFile(Toplevel):
         self.entry_2.insert("1.0", content)
         self.entry_2.place(x=171.0, y=67.0, width=558.0, height=459.0)
 
-    def button_1_clicked(self):
-        print("button_1 clicked")
+    def getName(self, name):
+        parts = name.split(".")
+        return parts[0]
+
+    def getExtension(self, name):
+        parts = name.split(".")
+        if len(parts) > 1:
+            return parts[-1]
+        else:
+            print("Falta ingresar la extension de la vara de la vara")
+            return ""
+
+    def uniqueFileNameVerification(self, fileName):
+        if not fileName in self.parent.fileSystem.currentDirectory.files:
+            return True
+        messagebox.showwarning("Archivo con mismo nombre","Se ha encontrado un archivo con el mismo nombre. Favor ingresar un nombre diferente al archivo.")
+        return False
+    
+    def saveButton(self):
+        
+        print("Primera tabla\n")
+        self.parent.fileSystem.fat.printFAT()
+        #Name
+        fullName = self.entry_1.get()
+        fileName = self.getName(fullName)
+        
+        #Name verification
+        if not self.uniqueFileNameVerification(fileName):
+            return
+        
+        #Extension
+        extension = self.getExtension(fullName)
+        
+        #Content
+        content = self.entry_2.get("1.0", "end")
+        
+        #Extension verification
+        if extension == "":
+            messagebox.showwarning("Falta de extension del archivo", "El nombre del archivo debe poseer la extension deseada")
+        
+        # To obtain the sectors list
+        oldSectorsList = self.parent.fileSystem.fat.getFileSectors(self.file.fat_index)
+        print("------Estos son los sectores viejos -------", oldSectorsList)
+        # To remove them from the disk
+        self.parent.fileSystem.disk.removeFromDisk(oldSectorsList)
+        # To write the new content
+        newSectorsList = self.parent.fileSystem.disk.writeToDisk(content)
+        # To free and update the FAT
+        self.parent.fileSystem.fat.freeFATEntries(self.file.fat_index)
+        newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
+        
+        # To update the file object
+        self.file.modifyContent(content)
+        self.file.assignSectors(newStartingIndex)
+
+        print("Segunda tabla\n")
+        self.parent.fileSystem.fat.printFAT()
+
+        self.destroy()
+            

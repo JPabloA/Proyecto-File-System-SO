@@ -109,7 +109,7 @@ class Disk:
                 else:
                     break
 
-            occupied_sectors.extend(sectors_list[0:len(content_chunks)])
+            occupied_sectors = sectors_list[0:len(content_chunks)]
 
             # Case 1: The file is equal or bigger in size (Requiered 0 or more sectors)
             if sectors_required >= 0:

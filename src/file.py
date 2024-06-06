@@ -16,7 +16,7 @@ class File:
     # To modify the file content
     def modifyContent(self, newContent):
         self.content = newContent
-        self.modificationDate = datetime.now()
+        self.modificationDate = datetime.datetime.now()
         self.size = len(newContent)
 
     # To view the file content

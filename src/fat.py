@@ -47,9 +47,10 @@ class FAT:
 
                 if sector_index != 0:
                     self.Table[ prev_table_index ] = ( self.Table[ prev_table_index ][0], table_index )
-
+                
                 prev_table_index = table_index
                 sector_index += 1
+
             table_index += 1
 
         # Return the first table index
