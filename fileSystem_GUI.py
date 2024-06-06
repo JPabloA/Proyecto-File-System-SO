@@ -226,7 +226,6 @@ class FileSystem_GUI(Tk):
         window.grab_set()
 
     def display_Copy_GUI(self, selected_obj: File | Directory):
-        print("antes de abrir", selected_obj)
         window = copy_GUI.CopyFiles(self, selected_obj)
         window.grab_set()
 

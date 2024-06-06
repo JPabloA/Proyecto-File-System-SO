@@ -42,6 +42,7 @@ class CopyFiles(Toplevel):
         self.entry_Origin = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
         self.entry_Origin.insert(0, path_origin)
         self.entry_Origin.place(x=14.0, y=45.0, width=722.0, height=33.0)
+        self.entry_Origin.config(state="disabled")
 
         # Text input: Directory path (Destiny)
         self.entry_Destiny = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
