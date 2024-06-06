@@ -85,7 +85,7 @@ class FileSystem:
         return self.currentDirectory.listDirectory()
 
     # Get the directory from a path
-    def __navigateToDirectory(self, path: str):
+    def navigateToDirectory(self, path: str):
         selected_directory: Directory = self.currentDirectory
 
         if "/" in path:

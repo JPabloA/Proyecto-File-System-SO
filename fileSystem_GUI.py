@@ -9,6 +9,7 @@ import GUI.editFile_GUI as editFile_GUI
 from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu, messagebox
 
 from src.FileSystem import FileSystem
+from src.directory import Directory
 
 class FileSystem_GUI(Tk):
 
@@ -258,6 +259,20 @@ class FileSystem_GUI(Tk):
             messagebox.showwarning("Este directorio no existe", f"El directorio '{dirName}' no existe en el directorio actual.")
             return None
         return dirObj
+    
+    def isUniqueInDestinyDir(self, name, type, destinyPath):
+        destinyDirectory: Directory
+        destinyDirectory = self.fileSystem.navigateToDirectory(destinyPath)
+        
+        # Verification to see if the path exists
+        if destinyDirectory == None:
+            messagebox.showwarning("Ruta no encontrada", "Favor ingresar una ruta correcta")
+        
+        if type == "File":
+            return name in destinyDirectory.files   
+        else:
+            return name in destinyDirectory.directories
+        
     
 if __name__ == "__main__":
     app = FileSystem_GUI()
