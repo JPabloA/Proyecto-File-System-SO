@@ -42,7 +42,6 @@ class CopyFiles(Toplevel):
         self.entry_Origin = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
         self.entry_Origin.insert(0, path_origin)
         self.entry_Origin.place(x=14.0, y=45.0, width=722.0, height=33.0)
-        self.entry_Origin.config(state="disabled")
 
         # Text input: Directory path (Destiny)
         self.entry_Destiny = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
@@ -72,6 +71,23 @@ class CopyFiles(Toplevel):
         path_destiny += "/" if path_destiny[-1] != "/" else ""
 
         return path_origin, path_destiny
+
+    def __copy_DirectoryContentRecursively(self, directory_origin: Directory, directory_destiny: Directory):
+        # Copy its files in the directory_destiny
+        for file in directory_origin.files.values():
+            file_name = file.name
+            file_extension = file.extension
+            file_content = file.content
+
+            self.parent.fileSystem.createFile( file_name, file_extension, file_content, directory_destiny )
+
+        # Copy its directories in the directory_destiny
+        for subdirectory in directory_origin.directories.values():
+            dir_name = subdirectory.name
+            self.parent.fileSystem.createDirectory( dir_name, directory_destiny )
+
+        for sub_origin, sub_destiny in zip(directory_origin.directories.values(), directory_destiny.directories.values()):
+            self.__copy_DirectoryContentRecursively( sub_origin, sub_destiny )
 
     def __copy_RealToVirtual(self):
         path_origin, path_destiny = self.__getInputPaths()
@@ -104,6 +120,10 @@ class CopyFiles(Toplevel):
             if self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
                 messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
             else:
-                self.parent.fileSystem.createDirectory( dir_name, directory_destiny )
+                # Create the directory in its destiny
+                directory_destiny = self.parent.fileSystem.createDirectory( dir_name, directory_destiny )
+
+                # Copy its content recursively
+                self.__copy_DirectoryContentRecursively(self.selected_obj, directory_destiny)
 
         self.destroy()
