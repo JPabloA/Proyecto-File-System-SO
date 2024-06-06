@@ -57,4 +57,14 @@ class FAT:
     # TODO: Get indices of a file
     # Funcion que retorne una lista de indices de todos los sectores que necesita un archivo
     # Importante: Variable que tiene la info es Table linea 3 (Estructura)
+
+    def getFileSectors(self, startIndex):
+        sectors = []
+        currentIndex = startIndex
     
+        while currentIndex != -1:
+            sectorId, nextIndex = self.Table[currentIndex]
+            sectors.append(sectorId)
+            currentIndex = nextIndex
+            
+        return sectors

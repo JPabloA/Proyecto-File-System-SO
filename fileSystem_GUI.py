@@ -107,7 +107,11 @@ class FileSystem_GUI(Tk):
                 self.__loadContentInFSDisplay()
                 print("Abriendo carpeta...")
             else:
-                print("Abriendo archivo...")
+                fileName = value.split("[FILE] ")[1]
+                fileObj = self.getFileObj(fileName)
+                content = self.getFileContent(fileObj)
+                self.display_EditFile_GUI(fileObj, content)
+                
 
     def __loadCurrentWorkingDirectory(self):
         cwd = self.fileSystem.getCurrentWorkingDirectory()
@@ -180,8 +184,10 @@ class FileSystem_GUI(Tk):
         window = createFile_GUI.CreateFile(self)
         window.grab_set()
 
-    def display_EditFile_GUI(self):
-        window = editFile_GUI.EditFile(self)
+    def display_EditFile_GUI(self, fileObj, content):
+        window = editFile_GUI.EditFile(self, fileObj, content)
+        window.deiconify()
+        window.update_idletasks() 
         window.grab_set()
 
     def deleteFunction(self):
@@ -192,8 +198,20 @@ class FileSystem_GUI(Tk):
             print("Eliminando el directorio/archivo")
         else:
             print ("Cancelando eliminacion")
+    
+    def getFileContent(self, fileObj):
+        return self.fileSystem.getFileContent(fileObj)
+
+    
+    def getFileObj(self,fileName):
+        if fileName in self.fileSystem.currentDirectory.files:
+            fileObj = self.fileSystem.currentDirectory.files[fileName]
+        else:
+            messagebox.showwarning("Este archivo no existe")
+            return None
         
-        
+        return fileObj
+    
 if __name__ == "__main__":
     app = FileSystem_GUI()
 

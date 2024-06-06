@@ -1,7 +1,7 @@
 from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
-
+from src.file import File
 class EditFile(Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, fileObj: File, content):
         super().__init__(parent)
         
         self.parent = parent
@@ -29,7 +29,8 @@ class EditFile(Toplevel):
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_1.insert(0, "RUTA DEL ARCHIVO")
+        self.entry_1.insert(0, fileObj.name + "." + fileObj.extension)
+        #self.entry_1.insert(0, "RUTA DEL ARCHIVO")
         self.entry_1.place(x=9.0, y=10.0, width=722.0, height=33.0)
 
         # Button: To save changes
@@ -51,7 +52,7 @@ class EditFile(Toplevel):
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_2.insert("1.0", "TEXTO DEL ARCHIVO")
+        self.entry_2.insert("1.0", content)
         self.entry_2.place(x=171.0, y=67.0, width=558.0, height=459.0)
 
     def button_1_clicked(self):

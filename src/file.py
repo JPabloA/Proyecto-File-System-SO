@@ -42,4 +42,5 @@ class File:
     # TODO: falta limpiar bien la estructura que vayamos a utilizar para el disco
     def releaseSectors(self):
         return -1
-
+    
+    # To get the file sectors

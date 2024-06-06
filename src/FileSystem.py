@@ -114,3 +114,14 @@ class FileSystem:
     # TODO: Encontrar un elemento ya sea carpeta o directorio
     def findElement(self, name):
         return self.root.findElement(name)
+    
+    # To get the file content
+    
+    def getFileContent (self, fileObj):
+        # To obtain sectors list
+        fileSectors = self.fat.getFileSectors(fileObj.fat_index)
+
+        # To read the content
+        fileContent = self.disk.readFromDisk(fileSectors)
+
+        return fileContent
