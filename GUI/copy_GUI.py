@@ -84,6 +84,10 @@ class CopyFiles(Toplevel):
         path_origin, path_destiny = self.__getInputPaths()
         directory_destiny: Directory = self.parent.fileSystem.navigateToDirectory( path_destiny )
 
+        if directory_destiny is None:
+            messagebox.showerror("Directorio destino no existe", "El directorio de destino no pudo ser encontrado, por favor ingrese una ruta válida")
+            return
+
         if self.isFile:
             file_name = self.selected_obj.name
             file_extension = self.selected_obj.extension
