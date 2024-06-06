@@ -52,7 +52,7 @@ class FileSystem:
         if selected_directory is None:
             selected_directory = self.currentDirectory
 
-        selected_directory.createDirectory(name)
+        return selected_directory.createDirectory(name)
 
     # ? Versión No usada
     def changeDirectory(self, selected_path: str):

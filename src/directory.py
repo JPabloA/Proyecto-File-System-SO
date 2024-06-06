@@ -22,6 +22,7 @@ class Directory:
 
         newDirectory = Directory(directoryName)
         self.directories[directoryName] = newDirectory
+        return newDirectory
 
     def getDirectoryName(self):
         return self.name
