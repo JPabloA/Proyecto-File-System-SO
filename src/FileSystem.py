@@ -39,7 +39,7 @@ class FileSystem:
 
         # File save the first sector
         newFile.assignSectors( first_FAT_sector )
-        self.currentDirectory.files[name] = newFile
+        self.currentDirectory.files[f"{name}.{extension}"] = newFile
 
     def getCurrentWorkingDirectory(self):
         # return self.currentDirectory.getDirectoryName()
@@ -84,20 +84,76 @@ class FileSystem:
     def listDirectory(self):
         return self.currentDirectory.listDirectory()
 
-    def removeFile(self, name):
-        if name in self.currentDirectory.files:
-            fileToRemove = self.currentDirectory.files.pop(name)
-            for sectorIndex in fileToRemove.sectors:
-                self.disk.__free_sectors.append(sectorIndex)
-                #! here we write in disk
-        else:
-            # actualmente chambeando en este
-            # me parece que remove remove no deberia de tener valida (Tal vez si para cuando no se ha refrescado)
+    # Get the directory from a path
+    def __navigateToDirectory(self, path: str):
+        selected_directory: Directory = self.currentDirectory
+
+        if "/" in path:
+            directories = path.split("/")[2:-1]
+            selected_directory = self.root
+            for d_name in directories:
+                try:
+                    selected_directory = selected_directory.directories[d_name]
+                except KeyError:
+                    print("Bad path received")
+                    return None
+        return selected_directory
+
+    # Clear directory content (Recursively)
+    def __clearDirectoryContent(self, current_dir: Directory):
+
+        # Clear all subdirectories
+        for subdirectory in list( current_dir.directories.values() ):
+            self.__clearDirectoryContent( subdirectory )
+
+        # Remove all files in the current directory
+        files_to_delete = [f"{file.name}.{file.extension}" for file in current_dir.files.values()]
+        for f_name in files_to_delete:
+            try:
+                selected_file: File = current_dir.files.pop( f_name )
+                sector_list = self.fat.freeFATEntries( selected_file.fat_index )
+                self.disk.removeFromDisk( sector_list )
+            except:
+                print(f"File: {f_name} not found --- Continuing...")
+
+        # Remove all the directories in the current directory
+        dirs_to_delete = list( current_dir.directories.keys() )
+        for d_name in dirs_to_delete:
+            try:
+                del current_dir.directories[ d_name ]
+            except:
+                print(f"Dir: {d_name} not found --- Continuing...")
+
+    # Remove a file by its name/path
+    def removeFile(self, file_name: str):
+        selected_directory: Directory = self.__navigateToDirectory( file_name )
+        if selected_directory is None:
+            return
+
+        file_name = file_name.split("/")[-1]
+
+        if file_name not in selected_directory.files:
             raise ValueError ("File not found.")
 
-    # TODO: Arreglar el borrado de los directorios (Recordar que deben de ser recursivos y volarse todo directorio o archivo que este dentro de el)
-    def remove_directory(self, name):
-        self.current_directory.remove_directory(name)
+        selected_file: File = selected_directory.files.pop( file_name )
+        sector_list = self.fat.freeFATEntries( selected_file.fat_index )
+        self.disk.removeFromDisk( sector_list )
+
+    # Remove a directory by its name/path
+    def remove_directory(self, dir_name: str):
+        selected_directory: Directory = self.__navigateToDirectory( dir_name )
+        if selected_directory is None:
+            return
+
+        dir_name = dir_name.split("/")[-1]
+
+        if dir_name not in selected_directory.directories:
+            raise ValueError ("Directory not found.")
+
+        directory_to_remove: Directory = selected_directory.directories[dir_name]
+        self.__clearDirectoryContent(directory_to_remove)
+        selected_directory.directories.pop(dir_name)
+
 
     # TODO: Terminar este move
     def moveElement():
