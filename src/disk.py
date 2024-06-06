@@ -166,8 +166,7 @@ class Disk:
                 print(f"Sector ID {sector_id} out of bounds")
                 continue
 
-            disk_line = disk_list[ sector_id ].split(":")
-            disk_list[ sector_id ] = f"{sector_id}:{'0' * self.__sector_size}"
+            disk_list[ sector_id ] = f"{sector_id}:{'0' * self.__sector_size}\n"
             self.__free_sectors[ sector_id ] = (sector_id, SectorState.FREE)
 
 

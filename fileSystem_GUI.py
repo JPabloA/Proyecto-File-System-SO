@@ -81,16 +81,17 @@ class FileSystem_GUI(Tk):
         button_4 = Button( text="Desp. Árbol", borderwidth=0, command=self.display_WindowShowTree, relief="flat" )
         button_4.place( x=9.0, y=213.0, width=150.0, height=35.0 )
 
-        button_5 = Button( text="Buscar", borderwidth=0, command=lambda: print("button_5 clicked"), relief="flat" )
+        button_5 = Button( text="Buscar", borderwidth=0, command=self.__onSearchRequest, relief="flat" )
         button_5.place( x=9.0, y=503.0, width=150.0, height=30.0 )
 
     def __goBackDirectory(self):
         current_path = self.fileSystem.getCurrentWorkingDirectory()
-        current_directory = current_path.rsplit("/", 1)[-1]
+        current_path = current_path.rsplit("/", 1)[0]
 
-        self.fileSystem.changeDirectory ( current_directory, True )
-        self.__loadCurrentWorkingDirectory()
-        self.__loadContentInFSDisplay()
+        if len(current_path) != 0:
+            self.fileSystem.changeDirectory ( current_path )
+            self.__loadCurrentWorkingDirectory()
+            self.__loadContentInFSDisplay()
 
     def __onFSDoubleClick(self, event):
         widget = event.widget
@@ -100,9 +101,10 @@ class FileSystem_GUI(Tk):
             value = widget.get(index)
 
             if "[DIR]" in value:
-                directory_name = value.split("[DIR] ")[1]
+                directory_name: str = value.split("[DIR] ")[1]
+                desired_path = directory_name if "/" in directory_name else self.fileSystem.getCurrentWorkingDirectory() + f"/{directory_name}"
 
-                self.fileSystem.changeDirectory( directory_name )
+                self.fileSystem.changeDirectory( desired_path )
                 self.__loadCurrentWorkingDirectory()
                 self.__loadContentInFSDisplay()
                 print("Abriendo carpeta...")
@@ -136,7 +138,7 @@ class FileSystem_GUI(Tk):
 
         menu = Menu( tearoff=0 )
         menu.add_command(label="Abrir", font="Arial 12", command=self.display_EditFile_GUI)
-        menu.add_command(label="Eliminar", font="Arial 12", command = self.deleteFunction)
+        menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_item ))
         menu.add_command(label="Copiar", font="Arial 12", command=self.display_Copy_GUI)
         menu.add_command(label="Mover", font="Arial 12", command=self.display_Move_GUI)
         menu.add_command(label="Ver propiedades", font="Arial 12", command=self.display_seeProperties)
@@ -146,13 +148,40 @@ class FileSystem_GUI(Tk):
         finally:
             menu.grab_release()
 
-    def __loadContentInFSDisplay(self):
+    def __loadContentInFSDisplay(self, search_result: list = []):
         self.textArea_Display.delete(0, "end")
 
-        content = self.fileSystem.listDirectory()
+        content = self.fileSystem.listDirectory() if len(search_result) == 0 else search_result
 
         for i in range(0, len(content)):
             self.textArea_Display.insert(i, content[i])
+
+    def __onSearchRequest(self):
+        search_value = self.textInput_SearchBar.get()
+        if len(search_value) == 0:
+            return
+
+        search_result = self.fileSystem.findElement(search_value)
+        self.__loadContentInFSDisplay( search_result )
+
+    def __deleteFunction(self, selected_item: str):
+
+        #verificacion y messagebox de si el archivo existe, tomar en cuenta que depende la operacion a realizar depende del tipo (Entonces primero debemos de sacar el tipo para luego proceder a eliminar)
+        if messagebox.askyesno("Eliminar","¿Estás seguro que deseas eliminar este archivo/directorio?"):
+            print("Eliminando el directorio/archivo")
+
+            if "[FILE]" in selected_item:
+                self.fileSystem.removeFile( selected_item.split("[FILE] ")[-1] )
+            elif "[DIR]" in selected_item:
+                self.fileSystem.remove_directory( selected_item.split("[DIR] ")[-1] )
+            else:
+                print("__deleteFunction: Object not recognized")
+                return
+
+            self.__loadContentInFSDisplay()
+
+        else:
+            print ("Cancelando eliminacion")
 
     def display_CreateDirectory_GUI(self):
         window = createDirectory_GUI.CreateDirectory_GUI(self)

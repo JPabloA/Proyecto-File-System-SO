@@ -8,6 +8,7 @@ class FAT:
     def printFAT(self):
         for entry in self.Table:
             print(f"Sector ID: {entry[0]}\tNext FAT index: {entry[1]} ")
+        print("\n")
 
     def createTable(self, sector_count):
         self.Table = [(-1, -1) for i in range(0, sector_count)]
@@ -53,7 +54,8 @@ class FAT:
 
         # Return the first table index
         return first_table_entry
-    
+
+
     # TODO: Get indices of a file
     # Funcion que retorne una lista de indices de todos los sectores que necesita un archivo
     # Importante: Variable que tiene la info es Table linea 3 (Estructura)
@@ -68,3 +70,17 @@ class FAT:
             currentIndex = nextIndex
             
         return sectors
+    
+    def freeFATEntries(self, starting_fat_index: int):
+        sector_list: list[int] = []
+
+        index = starting_fat_index
+        while index != -1:
+            fat_entry = self.Table[ index ]
+
+            self.Table[ index ] = (-1, -1)
+
+            sector_list.append( fat_entry[0] )
+            index = fat_entry[1]
+
+        return sector_list
