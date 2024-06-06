@@ -15,7 +15,7 @@ class FAT:
 
     def assingSectorList(self, sector_list: list[int]):
         first_table_entry = -1
-        prev_table_index = 0
+        prev_table_index = -1
         table_index = 0
         sector_index = 0
 
@@ -46,7 +46,7 @@ class FAT:
                 self.Table[ table_index ] = (sector_list[ sector_index ], -1)
 
                 if sector_index != 0:
-                    self.Table[ prev_table_index ] = ( self.Table[ prev_table_index ][0], table_index )
+                    self.Table[prev_table_index] = (self.Table[prev_table_index][0], table_index)
                 
                 prev_table_index = table_index
                 sector_index += 1

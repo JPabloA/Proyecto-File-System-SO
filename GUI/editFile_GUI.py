@@ -91,6 +91,7 @@ class EditFile(Toplevel):
         
         #Content
         content = self.entry_2.get("1.0", "end")
+        content = content.strip()
         
         #Extension verification
         if extension == "":

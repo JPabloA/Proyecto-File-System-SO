@@ -137,10 +137,19 @@ class FileSystem_GUI(Tk):
             return
 
         menu = Menu( tearoff=0 )
-        menu.add_command(label="Abrir", font="Arial 12", command=self.display_EditFile_GUI)
+        
+        if "[FILE]" in selected_item:
+            name = selected_item.split("[FILE] ")[-1]
+            object = self.getFileObj(name)
+            content = self.getFileContent(object)
+        elif "[DIR]" in selected_item:
+            name = selected_item.split("[DIR] ")[-1]
+            object = self.getDirObj(name)
+        
+        menu.add_command(label="Abrir", font="Arial 12", command= lambda: self.display_EditFile_GUI(object, content))
         menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_item ))
         menu.add_command(label="Copiar", font="Arial 12", command=self.display_Copy_GUI)
-        menu.add_command(label="Mover", font="Arial 12", command=self.display_Move_GUI)
+        menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI (object))
         menu.add_command(label="Ver propiedades", font="Arial 12", command=self.display_seeProperties)
 
         try:
@@ -196,8 +205,10 @@ class FileSystem_GUI(Tk):
         window = createDisk_GUI.CreateDisk_GUI(self)
         window.grab_set()
 
-    def display_Move_GUI(self):
-        window = move_GUI.Move_GUI(self)
+    def display_Move_GUI(self, object):
+        window = move_GUI.Move_GUI(self, object)
+        window.deiconify()
+        window.update_idletasks() 
         window.grab_set()
 
     def display_seeProperties(self):
@@ -230,16 +241,23 @@ class FileSystem_GUI(Tk):
     
     def getFileContent(self, fileObj):
         return self.fileSystem.getFileContent(fileObj)
-
     
     def getFileObj(self,fileName):
         if fileName in self.fileSystem.currentDirectory.files:
             fileObj = self.fileSystem.currentDirectory.files[fileName]
         else:
-            messagebox.showwarning("Este archivo no existe")
+            messagebox.showwarning("Este archivo no existe", f"El archivo '{fileName}' no existe en el directorio actual.")
             return None
         
         return fileObj
+    
+    def getDirObj(self, dirName):
+        if dirName in self.fileSystem.currentDirectory.directories:
+            dirObj = self.fileSystem.currentDirectory.directories[dirName]
+        else:
+            messagebox.showwarning("Este directorio no existe", f"El directorio '{dirName}' no existe en el directorio actual.")
+            return None
+        return dirObj
     
 if __name__ == "__main__":
     app = FileSystem_GUI()

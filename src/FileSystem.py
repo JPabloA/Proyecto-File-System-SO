@@ -156,8 +156,37 @@ class FileSystem:
 
 
     # TODO: Terminar este move
-    def moveElement():
-        return
+    def moveElement(self, sourcePath, destPath):
+        # Separate the file/directory name from the path
+        sourceName = sourcePath.split("/")[-1]
+        destDirPath = "/".join(destPath.split("/")[:-1])
+
+        # Check if the source element exists
+        sourceDir = self.__navigateToDirectory(sourcePath)
+        if sourceDir is None:
+            raise ValueError(f"The source path '{sourcePath}' does not exist.")
+
+        # Check if the destination is a valid directory
+        destDir = self.__navigateToDirectory(destDirPath)
+        if destDir is None:
+            raise ValueError(f"The destination path '{destDirPath}' does not exist.")
+
+        # Check if the destination element already exists
+        if sourceName in destDir.files or sourceName in destDir.directories:
+            raise ValueError(f"A file or directory with the name '{sourceName}' already exists in the destination path.")
+
+        # Move the file or directory
+        if sourcePath in sourceDir.files:
+            # Move a file
+            fileObj = sourceDir.files.pop(sourceName)
+            destDir.files[sourceName] = fileObj
+        elif sourcePath in sourceDir.directories:
+            # Move a directory
+            dirObj = sourceDir.directories.pop(sourceName)
+            destDir.directories[sourceName] = dirObj
+            dirObj.parentDirectory = destDir
+        else:
+            raise ValueError(f"A file or directory with the name '{sourceName}' was not found in the source path.")
 
     def __findInDirectory(self, search_value: str, selected_directory: Directory, dir_path: str):
         search_result = []
