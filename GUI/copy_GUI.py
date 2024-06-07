@@ -110,14 +110,14 @@ class CopyFiles(Toplevel):
             file_extension = self.selected_obj.extension
             file_content = self.selected_obj.content
 
-            if self.parent.isUniqueInDestinyDir( f"{file_name}.{file_extension}", "File", path_destiny ):
+            if not self.parent.isUniqueInDestinyDir( f"{file_name}.{file_extension}", "File", path_destiny ):
                 messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
             else:
                 self.parent.fileSystem.createFile( file_name, file_extension, file_content, directory_destiny )
         else:
             dir_name = self.selected_obj.name
 
-            if self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
+            if not self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
                 messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
             else:
                 # Create the directory in its destiny
