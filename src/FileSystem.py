@@ -26,7 +26,10 @@ class FileSystem:
         self.disk.createDisk()
         self.fat.createTable( sector_count )
 
-    def createFile(self, name, extension, content):
+    def createFile(self, name, extension, content, selected_directory: Directory = None):
+
+        if selected_directory is None:
+            selected_directory = self.currentDirectory
 
         newFile = File(name, extension, content)
         sectors_list = self.disk.writeToDisk(content)
@@ -39,14 +42,17 @@ class FileSystem:
 
         # File save the first sector
         newFile.assignSectors( first_FAT_sector )
-        self.currentDirectory.files[f"{name}.{extension}"] = newFile
+        selected_directory.files[f"{name}.{extension}"] = newFile
 
     def getCurrentWorkingDirectory(self):
         # return self.currentDirectory.getDirectoryName()
         return self.path
 
-    def createDirectory(self, name):
-        self.currentDirectory.createDirectory(name)
+    def createDirectory(self, name: str, selected_directory: Directory = None):
+        if selected_directory is None:
+            selected_directory = self.currentDirectory
+
+        return selected_directory.createDirectory(name)
 
     # ? Versión No usada
     def changeDirectory(self, selected_path: str):
@@ -126,7 +132,7 @@ class FileSystem:
 
     # Remove a file by its name/path
     def removeFile(self, file_name: str):
-        selected_directory: Directory = self.__navigateToDirectory( file_name )
+        selected_directory: Directory = self.navigateToDirectory( file_name )
         if selected_directory is None:
             return
 
@@ -141,7 +147,7 @@ class FileSystem:
 
     # Remove a directory by its name/path
     def remove_directory(self, dir_name: str):
-        selected_directory: Directory = self.__navigateToDirectory( dir_name )
+        selected_directory: Directory = self.navigateToDirectory( dir_name )
         if selected_directory is None:
             return
 
