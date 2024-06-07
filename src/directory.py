@@ -49,3 +49,12 @@ class Directory:
 
     def getDirectories(self):
         return self.directories
+    
+    def removeDirectory(self, name):
+        if name in self.directories:
+            self.directories.pop(name)
+    
+    def removeFile(self, name):
+        if name in self.files:
+            self.files.pop(name)
+            

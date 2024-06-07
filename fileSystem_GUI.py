@@ -269,9 +269,9 @@ class FileSystem_GUI(Tk):
             messagebox.showwarning("Ruta no encontrada", "Favor ingresar una ruta correcta")
         
         if type == "File":
-            return name in destinyDirectory.files   
+            return not name in destinyDirectory.files   
         else:
-            return name in destinyDirectory.directories
+            return not name in destinyDirectory.directories
         
     
 if __name__ == "__main__":
