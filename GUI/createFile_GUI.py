@@ -1,9 +1,10 @@
 from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel, messagebox
+from fileSystem_GUI import FileSystem_GUI
 
 class CreateFile(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
-        self.parent = parent
+        self.parent: FileSystem_GUI = parent
         self.title("Create File")
         self.geometry("750x550")
         self.configure(bg="#FFFFFF")
@@ -30,7 +31,7 @@ class CreateFile(Toplevel):
         )
         # To get the current directory absolute route
         #self.entry_1.insert(0, parent.fileSystem.currentDirectory.name)
-        
+
         self.entry_1.insert(0, "Nombre con extension (Por ejemplo: Archivo.txt)")
         self.entry_1.place(x=9.0, y=10.0, width=722.0, height=33.0)
 
@@ -63,30 +64,30 @@ class CreateFile(Toplevel):
         else:
             print("Falta ingresar la extension de la vara de la vara")
             return ""
-    
+
     def getName(self, name):
         parts = name.split(".")
         return parts[0]
-    
+
     def diskVerification(self):
         if not self.parent.fileSystem.disk == None:
             return True
         messagebox.showwarning("Disco no encontrado","Disco no creado. Favor crear un disco antes de intentar crear un archivo")
         return False
-        
-    
+
+
     def uniqueFileNameVerification(self, fileName):
         if not fileName in self.parent.fileSystem.currentDirectory.files:
             return True
         messagebox.showwarning("Archivo con mismo nombre","Se ha encontrado un archivo con el mismo nombre. Favor ingresar un nombre diferente al archivo.")
         return False
-            
+
     # TODO: Validaciones necesarias para asegurar que el nombre sea apto
     def createFile(self):
         # Disk verification
         if not self.diskVerification():
             return
-        
+
         # Name verification
         fullName = self.entry_1.get()
         fileName = self.getName(fullName)
@@ -97,8 +98,9 @@ class CreateFile(Toplevel):
         content = self.entry_2.get("1.0", "end")
         if extension != "":
             self.parent.fileSystem.createFile(fileName, extension, content)
+            self.parent.reloadFileSystem()
             self.destroy()
         else:
             print("Falta de extension")
-            
+
 

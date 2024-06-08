@@ -1,5 +1,4 @@
 from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
-from src.FileSystem import FileSystem
 
 class CreateDirectory_GUI(Toplevel):
     def __init__(self, parent):
@@ -38,6 +37,7 @@ class CreateDirectory_GUI(Toplevel):
             return
 
         self.parent.fileSystem.createDirectory( directory_name )
+        self.parent.reloadFileSystem()
         self.destroy()
 
 

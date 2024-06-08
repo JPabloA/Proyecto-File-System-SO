@@ -234,7 +234,6 @@ class FileSystem_GUI(Tk):
     def display_CreateDirectory_GUI(self):
         window = createDirectory_GUI.CreateDirectory_GUI(self)
         window.grab_set()
-        self.__loadContentInFSDisplay()
 
     def display_WindowShowTree(self):
         window = showTree_GUI.ShowTree_GUI(self)
@@ -310,6 +309,10 @@ class FileSystem_GUI(Tk):
             return not name in destinyDirectory.files
         else:
             return not name in destinyDirectory.directories
+
+    def reloadFileSystem(self):
+        self.__loadCurrentWorkingDirectory()
+        self.__loadContentInFSDisplay()
 
 
 if __name__ == "__main__":

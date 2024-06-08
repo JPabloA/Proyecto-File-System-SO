@@ -1,10 +1,9 @@
 from tkinter import Canvas, Entry, Button, Toplevel, messagebox
 from src.file import File
 from src.directory import Directory
-from fileSystem_GUI import FileSystem_GUI
 
 class CopyFiles(Toplevel):
-    def __init__(self, parent: FileSystem_GUI, selected_obj: File | Directory):
+    def __init__(self, parent, selected_obj: File | Directory):
         super().__init__(parent)
 
         self.parent = parent
