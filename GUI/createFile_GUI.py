@@ -91,9 +91,10 @@ class CreateFile(Toplevel):
         # Name verification
         fullName = self.entry_1.get()
         fileName = self.getName(fullName)
-        if not self.uniqueFileNameVerification(fileName):
-            return
         extension = self.getExtension(fullName)
+
+        if not self.uniqueFileNameVerification(f"{fileName}.{extension}"):
+            return
 
         content = self.entry_2.get("1.0", "end")
         if extension != "":

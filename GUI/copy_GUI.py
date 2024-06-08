@@ -113,6 +113,7 @@ class CopyFiles(Toplevel):
                 messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
             else:
                 self.parent.fileSystem.createFile( file_name, file_extension, file_content, directory_destiny )
+                self.destroy()
         else:
             dir_name = self.selected_obj.name
 
@@ -124,5 +125,4 @@ class CopyFiles(Toplevel):
 
                 # Copy its content recursively
                 self.__copy_DirectoryContentRecursively(self.selected_obj, directory_destiny)
-
-        self.destroy()
+                self.destroy()

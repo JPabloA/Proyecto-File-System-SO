@@ -18,7 +18,7 @@ class Directory:
 
     def createDirectory (self, directoryName: str):
         if directoryName in self.files or directoryName in self.directories:
-            raise ValueError("A file or directory with this name already exists.")
+            return None
 
         newDirectory = Directory(directoryName)
         self.directories[directoryName] = newDirectory

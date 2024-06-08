@@ -92,8 +92,7 @@ class FileSystem_GUI(Tk):
 
         if len(current_path) != 0:
             self.fileSystem.changeDirectory ( current_path )
-            self.__loadCurrentWorkingDirectory()
-            self.__loadContentInFSDisplay()
+            self.reloadFileSystem()
 
     def __onFSDoubleClick(self, event):
         widget = event.widget
@@ -102,18 +101,16 @@ class FileSystem_GUI(Tk):
             index = selection[0]
             value = widget.get(index)
 
+            selected_path, selected_obj = self.__splitPathAndObject( value )
+
             if "[DIR]" in value:
                 directory_name: str = value.split("[DIR] ")[1]
                 desired_path = directory_name if "/" in directory_name else self.fileSystem.getCurrentWorkingDirectory() + f"/{directory_name}"
 
-                print( "eheh", desired_path )
-
                 self.fileSystem.changeDirectory( desired_path )
-                self.__loadCurrentWorkingDirectory()
-                self.__loadContentInFSDisplay()
+                self.reloadFileSystem()
             else:
-                fileName = value.split("[FILE] ")[1]
-                fileObj = self.getFileObj(fileName)
+                fileObj = self.getFileObj(selected_obj, "" if selected_path is None else selected_path)
                 content = self.getFileContent(fileObj)
                 self.display_EditFile_GUI(fileObj, content)
 
@@ -126,6 +123,8 @@ class FileSystem_GUI(Tk):
         self.textInput_DirectoryPath.insert(0, cwd)
         self.textInput_DirectoryPath.config(state="disabled")
 
+    # If selected_item = "[X] /root/aaa/bbb" => Returns: ("/root/aaa", "bbb")
+    # If selected_item = "[X] bbb" => Returns: (None, "bbb")
     def __splitPathAndObject(self, selected_item: str):
 
         clear_item: str
@@ -152,17 +151,13 @@ class FileSystem_GUI(Tk):
         if (isFile):
             self.display_EditFile_GUI( request_obj, obj_content )
         else:
-            obj_path = (obj_path if obj_path else self.fileSystem.getCurrentWorkingDirectory()) + f"{request_obj.name}"
-            print(">>> ",obj_path)
+            obj_path = (obj_path if obj_path else (self.fileSystem.getCurrentWorkingDirectory() + "/")) + f"{request_obj.name}"
             self.fileSystem.changeDirectory( obj_path )
-            self.__loadCurrentWorkingDirectory()
-            self.__loadContentInFSDisplay()
+            self.reloadFileSystem()
 
 
     def __contentDisplayRightClick(self, event):
-
         isFile: bool = True
-
         # Get the selected file/directory
         try:
             index = self.textArea_Display.nearest(event.y)
@@ -190,8 +185,8 @@ class FileSystem_GUI(Tk):
 
         menu.add_command(label="Abrir", font="Arial 12", command= lambda: self.__openSelectedObject( request_obj, obj_content, selected_path, isFile ))
         menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_item ))
-        menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( selected_obj ))
-        menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI (request_obj))
+        menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( request_obj ))
+        menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI ( request_obj ))
         menu.add_command(label="Ver propiedades", font="Arial 12", command=self.display_seeProperties)
 
         try:
@@ -266,14 +261,6 @@ class FileSystem_GUI(Tk):
         window.deiconify()
         window.update_idletasks()
         window.grab_set()
-
-    def deleteFunction(self):
-        #verificacion y messagebox de si el archivo existe, tomar en cuenta que depende la operacion a realizar depende del tipo (Entonces primero debemos de sacar el tipo para luego proceder a eliminar)
-        if messagebox.askyesno("Eliminar","¿Estás seguro que deseas eliminar este archivo/directorio?"):
-            #Codigo que en caso de que el usuario presione que si
-            print("Eliminando el directorio/archivo")
-        else:
-            print ("Cancelando eliminacion")
 
     def getFileContent(self, fileObj):
         return self.fileSystem.getFileContent(fileObj)

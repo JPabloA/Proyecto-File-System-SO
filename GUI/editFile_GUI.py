@@ -3,7 +3,7 @@ from src.file import File
 class EditFile(Toplevel):
     def __init__(self, parent, fileObj: File, content):
         super().__init__(parent)
-        
+
         self.file = fileObj
         self.parent = parent
         self.title("Edit File")
@@ -21,7 +21,7 @@ class EditFile(Toplevel):
             relief="ridge"
         )
         canvas.place(x=0, y=0)
-        
+
         # Text input: Directory path
         self.entry_1 = Entry(
             self,
@@ -73,30 +73,30 @@ class EditFile(Toplevel):
             return True
         messagebox.showwarning("Archivo con mismo nombre","Se ha encontrado un archivo con el mismo nombre. Favor ingresar un nombre diferente al archivo.")
         return False
-    
+
     def saveButton(self):
-        
+
         print("Primera tabla\n")
         self.parent.fileSystem.fat.printFAT()
         #Name
         fullName = self.entry_1.get()
         fileName = self.getName(fullName)
-        
+
         #Name verification
         if not self.uniqueFileNameVerification(fileName):
             return
-        
+
         #Extension
         extension = self.getExtension(fullName)
-        
+
         #Content
         content = self.entry_2.get("1.0", "end")
         content = content.strip()
-        
+
         #Extension verification
         if extension == "":
             messagebox.showwarning("Falta de extension del archivo", "El nombre del archivo debe poseer la extension deseada")
-        
+
         # To obtain the sectors list
         oldSectorsList = self.parent.fileSystem.fat.getFileSectors(self.file.fat_index)
         print("------Estos son los sectores viejos -------", oldSectorsList)
@@ -107,7 +107,7 @@ class EditFile(Toplevel):
         # To free and update the FAT
         self.parent.fileSystem.fat.freeFATEntries(self.file.fat_index)
         newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
-        
+
         # To update the file object
         self.file.modifyContent(content)
         self.file.assignSectors(newStartingIndex)
@@ -116,4 +116,3 @@ class EditFile(Toplevel):
         self.parent.fileSystem.fat.printFAT()
 
         self.destroy()
-            

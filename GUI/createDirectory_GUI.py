@@ -1,4 +1,5 @@
-from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel
+from tkinter import Tk, Canvas, Entry, Text, Button, Toplevel, messagebox
+from src.directory import Directory
 
 class CreateDirectory_GUI(Toplevel):
     def __init__(self, parent):
@@ -36,9 +37,13 @@ class CreateDirectory_GUI(Toplevel):
         if len(directory_name) == 0:
             return
 
-        self.parent.fileSystem.createDirectory( directory_name )
-        self.parent.reloadFileSystem()
-        self.destroy()
+        created_dir: Directory | None = self.parent.fileSystem.createDirectory( directory_name )
+
+        if created_dir is None:
+            messagebox.showerror("Directorio con el mismo nombre", "Se encontró un directorio con el mismo nombre, por favor, coloque otro nombre")
+        else:
+            self.parent.reloadFileSystem()
+            self.destroy()
 
 
 
