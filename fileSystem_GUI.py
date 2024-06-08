@@ -106,10 +106,11 @@ class FileSystem_GUI(Tk):
                 directory_name: str = value.split("[DIR] ")[1]
                 desired_path = directory_name if "/" in directory_name else self.fileSystem.getCurrentWorkingDirectory() + f"/{directory_name}"
 
+                print( "eheh", desired_path )
+
                 self.fileSystem.changeDirectory( desired_path )
                 self.__loadCurrentWorkingDirectory()
                 self.__loadContentInFSDisplay()
-                print("Abriendo carpeta...")
             else:
                 fileName = value.split("[FILE] ")[1]
                 fileObj = self.getFileObj(fileName)
@@ -125,7 +126,43 @@ class FileSystem_GUI(Tk):
         self.textInput_DirectoryPath.insert(0, cwd)
         self.textInput_DirectoryPath.config(state="disabled")
 
+    def __splitPathAndObject(self, selected_item: str):
+
+        clear_item: str
+
+        if "[FILE]" in selected_item:
+            clear_item = selected_item.split("[FILE] ")[-1]
+        elif "[DIR]" in selected_item:
+            clear_item = selected_item.split("[DIR] ")[-1]
+
+        path_splited: list[str] = clear_item.rsplit("/", 1)
+
+        selected_path: str = None
+        selected_objt: str = None
+
+        if len(path_splited) == 2:
+            selected_path = path_splited[0] + "/"
+            selected_objt = path_splited[1]
+        else:
+            selected_objt = path_splited[0]
+
+        return selected_path, selected_objt
+
+    def __openSelectedObject(self, request_obj: File | Directory, obj_content: str = "", obj_path:str | None = None, isFile: bool = True):
+        if (isFile):
+            self.display_EditFile_GUI( request_obj, obj_content )
+        else:
+            obj_path = (obj_path if obj_path else self.fileSystem.getCurrentWorkingDirectory()) + f"{request_obj.name}"
+            print(">>> ",obj_path)
+            self.fileSystem.changeDirectory( obj_path )
+            self.__loadCurrentWorkingDirectory()
+            self.__loadContentInFSDisplay()
+
+
     def __contentDisplayRightClick(self, event):
+
+        isFile: bool = True
+
         # Get the selected file/directory
         try:
             index = self.textArea_Display.nearest(event.y)
@@ -138,29 +175,23 @@ class FileSystem_GUI(Tk):
         if len(selected_item) <= 0:
             return
 
-        selected_obj: File | Directory
+        selected_path, selected_obj = self.__splitPathAndObject( selected_item )
 
         if "[FILE]" in selected_item:
-            selected_item = selected_item.split("[FILE] ")[-1]
-            selected_obj = self.getFileObj( selected_item )
+            request_obj: File = self.getFileObj( selected_obj, "" if selected_path is None else selected_path )
+            obj_content: str = self.getFileContent( request_obj )
+            isFile = True
         elif "[DIR]" in selected_item:
-            selected_item = selected_item.split("[DIR] ")[-1]
-            selected_obj = self.getDirObj( selected_item )
+            request_obj: Directory = self.getDirObj( selected_obj, "" if selected_path is None else selected_path )
+            obj_content = ""
+            isFile = False
 
         menu = Menu( tearoff=0 )
 
-        if "[FILE]" in selected_item:
-            name = selected_item.split("[FILE] ")[-1]
-            object = self.getFileObj(name)
-            content = self.getFileContent(object)
-        elif "[DIR]" in selected_item:
-            name = selected_item.split("[DIR] ")[-1]
-            object = self.getDirObj(name)
-
-        menu.add_command(label="Abrir", font="Arial 12", command= lambda: self.display_EditFile_GUI(object, content))
+        menu.add_command(label="Abrir", font="Arial 12", command= lambda: self.__openSelectedObject( request_obj, obj_content, selected_path, isFile ))
         menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_item ))
         menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( selected_obj ))
-        menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI (object))
+        menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI (request_obj))
         menu.add_command(label="Ver propiedades", font="Arial 12", command=self.display_seeProperties)
 
         try:
@@ -187,8 +218,6 @@ class FileSystem_GUI(Tk):
     def __deleteFunction(self, selected_item: str):
         #verificacion y messagebox de si el archivo existe, tomar en cuenta que depende la operacion a realizar depende del tipo (Entonces primero debemos de sacar el tipo para luego proceder a eliminar)
         if messagebox.askyesno("Eliminar","¿Estás seguro que deseas eliminar este archivo/directorio?"):
-            print("Eliminando el directorio/archivo")
-
             if "[FILE]" in selected_item:
                 self.fileSystem.removeFile( selected_item.split("[FILE] ")[-1] )
             elif "[DIR]" in selected_item:
@@ -250,18 +279,20 @@ class FileSystem_GUI(Tk):
     def getFileContent(self, fileObj):
         return self.fileSystem.getFileContent(fileObj)
 
-    def getFileObj(self,fileName):
-        if fileName in self.fileSystem.currentDirectory.files:
-            fileObj = self.fileSystem.currentDirectory.files[fileName]
+    def getFileObj(self, fileName: str, path: str = ""):
+        selected_directory = self.fileSystem.navigateToDirectory( path )
+        if fileName in selected_directory.files:
+            fileObj = selected_directory.files[fileName]
         else:
             messagebox.showwarning("Este archivo no existe", f"El archivo '{fileName}' no existe en el directorio actual.")
             return None
 
         return fileObj
 
-    def getDirObj(self, dirName):
-        if dirName in self.fileSystem.currentDirectory.directories:
-            dirObj = self.fileSystem.currentDirectory.directories[dirName]
+    def getDirObj(self, dirName: str, path: str = ""):
+        selected_directory = self.fileSystem.navigateToDirectory( path )
+        if dirName in selected_directory.directories:
+            dirObj = selected_directory.directories[dirName]
         else:
             messagebox.showwarning("Este directorio no existe", f"El directorio '{dirName}' no existe en el directorio actual.")
             return None
@@ -276,11 +307,11 @@ class FileSystem_GUI(Tk):
             messagebox.showwarning("Ruta no encontrada", "Favor ingresar una ruta correcta")
 
         if type == "File":
-            return not name in destinyDirectory.files   
+            return not name in destinyDirectory.files
         else:
             return not name in destinyDirectory.directories
-        
-    
+
+
 if __name__ == "__main__":
     app = FileSystem_GUI()
 
