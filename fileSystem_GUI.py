@@ -104,8 +104,11 @@ class FileSystem_GUI(Tk):
             selected_path, selected_obj = self.__splitPathAndObject( value )
 
             if "[DIR]" in value:
-                directory_name: str = value.split("[DIR] ")[1]
-                desired_path = directory_name if "/" in directory_name else self.fileSystem.getCurrentWorkingDirectory() + f"/{directory_name}"
+                desired_path: str
+                if selected_path is None:
+                    desired_path = self.fileSystem.getCurrentWorkingDirectory() + f"/{selected_obj}"
+                else:
+                    desired_path = f"{selected_path}{selected_obj}"
 
                 self.fileSystem.changeDirectory( desired_path )
                 self.reloadFileSystem()
