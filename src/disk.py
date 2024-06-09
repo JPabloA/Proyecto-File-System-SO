@@ -39,7 +39,7 @@ class Disk:
     # Private: Divide the content in string chunks of the size of a sector
     def __splitContentInChunks(self, content):
         content_chunks: list[str] = [content[i:i + self.__sector_size] for i in range(0, len(content), self.__sector_size)]
-        
+
         # To remove line jump
         content_chunks[-1] = content_chunks[-1].strip()
 
@@ -55,6 +55,8 @@ class Disk:
 
     # Write into the virtual disk
     def writeToDisk(self, sector_content: str, sectors_list: list[int] = []):
+
+        sector_content = sector_content.encode("utf-8").hex()
 
         # 0. Split content in chunks of the size of the sector
         content_chunks = self.__splitContentInChunks( sector_content )
@@ -152,6 +154,7 @@ class Disk:
             disk_line = disk_list[ sector_id ].split(":")
             content += disk_line[1].strip("\n")
 
+        content = bytes.fromhex( content ).decode("utf-8")
         content = content.rstrip("0")
         return content
 
