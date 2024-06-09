@@ -22,7 +22,7 @@ class CopyFiles(Toplevel):
             return
 
         self.title("Copy Files")
-        self.geometry("750x593")
+        self.geometry("750x405")
         self.configure(bg="#FFFFFF")
         self.resizable(False, False)
 

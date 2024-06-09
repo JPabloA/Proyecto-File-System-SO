@@ -64,7 +64,7 @@ class FileSystem_GUI(Tk):
         self.__loadContentInFSDisplay()
 
         # Button: Refresh display directory
-        button_UpdateDirectory = Button( text="↺", command=lambda: self.__loadContentInFSDisplay() , relief="flat", font="Arial 16" )
+        button_UpdateDirectory = Button( text="↺", command=lambda: self.reloadFileSystem() , relief="flat", font="Arial 16" )
         button_UpdateDirectory.place( x=696.0, y=11.0, width=35.0, height=35.0 )
 
         # Button: Go 1 directory back
@@ -118,12 +118,16 @@ class FileSystem_GUI(Tk):
                 self.display_EditFile_GUI(fileObj, content)
 
 
-    def __loadCurrentWorkingDirectory(self):
-        cwd = self.fileSystem.getCurrentWorkingDirectory()
+    def __loadCurrentWorkingDirectory(self, entry_content: str = ""):
+        content: str
+        if entry_content == "":
+            content = self.fileSystem.getCurrentWorkingDirectory()
+        else:
+            content = entry_content
 
         self.textInput_DirectoryPath.config(state="normal")
         self.textInput_DirectoryPath.delete(0, END)
-        self.textInput_DirectoryPath.insert(0, cwd)
+        self.textInput_DirectoryPath.insert(0, content)
         self.textInput_DirectoryPath.config(state="disabled")
 
     # If selected_item = "[X] /root/aaa/bbb" => Returns: ("/root/aaa", "bbb")
@@ -197,10 +201,10 @@ class FileSystem_GUI(Tk):
         finally:
             menu.grab_release()
 
-    def __loadContentInFSDisplay(self, search_result: list = []):
+    def __loadContentInFSDisplay(self, search_result: list = [], search_request: bool = False):
         self.textArea_Display.delete(0, "end")
 
-        content = self.fileSystem.listDirectory() if len(search_result) == 0 else search_result
+        content = search_result if search_request else self.fileSystem.listDirectory()
 
         for i in range(0, len(content)):
             self.textArea_Display.insert(i, content[i])
@@ -211,7 +215,8 @@ class FileSystem_GUI(Tk):
             return
 
         search_result = self.fileSystem.findElement(search_value)
-        self.__loadContentInFSDisplay( search_result )
+        self.__loadContentInFSDisplay( search_result, True )
+        self.__loadCurrentWorkingDirectory( f"Resultados de la búsqueda: {search_value}" )
 
     def __deleteFunction(self, selected_item: str):
         #verificacion y messagebox de si el archivo existe, tomar en cuenta que depende la operacion a realizar depende del tipo (Entonces primero debemos de sacar el tipo para luego proceder a eliminar)

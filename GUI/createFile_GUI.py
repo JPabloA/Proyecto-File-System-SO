@@ -20,6 +20,7 @@ class CreateFile(Toplevel):
             relief="ridge"
         )
         canvas.place(x=0, y=0)
+        canvas.create_text( 30.0, 32.0, anchor="nw", text="Nombre del archivo", fill="#000000", font=("Inter", 16 * -1) )
 
         # Text input: Directory path
         self.entry_1 = Entry(
@@ -32,8 +33,7 @@ class CreateFile(Toplevel):
         # To get the current directory absolute route
         #self.entry_1.insert(0, parent.fileSystem.currentDirectory.name)
 
-        self.entry_1.insert(0, "Nombre con extension (Por ejemplo: Archivo.txt)")
-        self.entry_1.place(x=9.0, y=10.0, width=722.0, height=33.0)
+        self.entry_1.place( x=30.00, y=65.00, width=690, height=35 )
 
         # Button: To save the content
         self.button_1 = Button(
@@ -44,7 +44,7 @@ class CreateFile(Toplevel):
             command= lambda: self.createFile(),
             relief="flat"
         )
-        self.button_1.place(x=9.0, y=67.0, width=149.0000762939453, height=49.0)
+        self.button_1.place( x=30.00, y=130.00, width=110, height=35 )
 
         # Text input: To modify the content of the file
         self.entry_2 = Text(
@@ -55,7 +55,7 @@ class CreateFile(Toplevel):
             highlightthickness=0
         )
         self.entry_2.insert("1.0", "Contenido")
-        self.entry_2.place(x=171.0, y=67.0, width=558.0, height=459.0)
+        self.entry_2.place( x=155.00, y=130.00, width=570, height=400 )
 
     def getExtension(self, name):
         parts = name.split(".")

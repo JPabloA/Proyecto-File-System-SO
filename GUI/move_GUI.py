@@ -21,7 +21,7 @@ class Move_GUI(Toplevel):
         elif isinstance(self.object, Directory):
             self.object: Directory
 
-        self.geometry("750x593")
+        self.geometry("750x335")
         self.configure(bg = "#FFFFFF")
 
         canvas = Canvas(
@@ -62,7 +62,7 @@ class Move_GUI(Toplevel):
         self.button_1.place( x=9.0, y=196.0, width=203.0, height=49.0 )
 
         self.button_2 = Button( self, text="Cancelar", borderwidth=0, highlightthickness=0, command=self.destroy, relief="flat" )
-        self.button_2.place( x=9.0, y=270.0, width=203.0, height=49.0 )
+        self.button_2.place( x=9.0, y=265.0, width=203.0, height=49.0 )
 
     def moveElement(self):
 
