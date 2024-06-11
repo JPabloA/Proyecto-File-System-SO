@@ -1,6 +1,7 @@
 from tkinter import Canvas, Entry, Button, Toplevel, messagebox
 from src.file import File
 from src.directory import Directory
+import os
 
 class CopyFiles(Toplevel):
     def __init__(self, parent, selected_obj: File | Directory):
@@ -90,11 +91,57 @@ class CopyFiles(Toplevel):
 
     def __copy_RealToVirtual(self):
         path_origin, path_destiny = self.__getInputPaths()
-        print("")
+        directory_destiny: Directory = self.parent.fileSystem.navigateToDirectory( path_destiny )
+
+        if not os.path.isfile(path_origin):
+            print(f"El archivo en la ruta {path_origin} no existe.")
+            return
+    
+        # Obtener el nombre del archivo y su extensión
+        file_name = os.path.basename(path_destiny)
+        nombre, extension = os.path.splitext(file_name)
+        extension = extension.lstrip('.')  # Eliminar el punto inicial de la extensión
+
+        # Leer el contenido del archivo
+        with open(path_destiny, 'r') as archivo:
+            file_content = archivo.read()
+
+        self.parent.fileSystem.createFile(nombre, extension, file_content, directory_destiny)
+            
+        print(f"Archivo {file_name} copiado a la memoria virtual.")
 
     def __copy_VirtualToReal(self):
         path_origin, path_destiny = self.__getInputPaths()
-        print("button_2 clicked")
+
+        if self.isFile:
+            file_name = self.selected_obj.name
+            file_extension = self.selected_obj.extension
+            file_content = self.selected_obj.content
+
+            if not self.parent.isUniqueInDestinyDir( f"{file_name}.{file_extension}", "File", path_destiny ):
+                messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
+            else:
+                # Crear o sobrescribir el archivo en la ruta especificada
+                with open(path_destiny, 'w') as archivo:
+                    archivo.write(file_content)  # Puedes escribir contenido en el archivo si lo deseas
+                print(f"Archivo creado en: {path_destiny}")
+                self.destroy()
+        else:
+            dir_name = self.selected_obj.name
+
+            if not self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
+                messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
+            else:
+                try:
+                    # Crear el directorio y todos los directorios intermedios necesarios
+                    os.makedirs(path_destiny, exist_ok=True)
+                    print(f"Directorio creado en: {path_destiny}")
+                except OSError as e:
+                    print(f"Error al crear el directorio: {e}")
+
+                # Copy its content recursively
+                #self.__copy_DirectoryContentRecursively(self.selected_obj, path_destiny)
+                self.destroy()
 
     def __copy_VirtualToVirtual(self):
         path_origin, path_destiny = self.__getInputPaths()

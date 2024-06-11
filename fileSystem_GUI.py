@@ -194,7 +194,7 @@ class FileSystem_GUI(Tk):
         menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_item ))
         menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( request_obj ))
         menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI ( request_obj ))
-        menu.add_command(label="Ver propiedades", font="Arial 12", command=self.display_seeProperties)
+        menu.add_command(label="Ver propiedades", font="Arial 12", command= lambda: self.display_seeProperties( request_obj ))
 
         try:
             menu.tk_popup(event.x_root, event.y_root)
@@ -252,8 +252,8 @@ class FileSystem_GUI(Tk):
         window.update_idletasks()
         window.grab_set()
 
-    def display_seeProperties(self):
-        window = seeProperties_GUI.SeeProperties_GUI(self)
+    def display_seeProperties(self, object):
+        window = seeProperties_GUI.SeeProperties_GUI(self, object)
         window.grab_set()
 
     def display_Copy_GUI(self, selected_obj: File | Directory):

@@ -58,4 +58,30 @@ class Directory:
     def removeFile(self, name):
         if name in self.files:
             self.files.pop(name)
+    
+    def __getDirectorySize(self, selected_dir, total_size: int = 0):
+        for file in selected_dir.files.values():
+            total_size += file.size
+
+        for s_dir in selected_dir.directories.values():
+            total_size = self.__getDirectorySize( s_dir, total_size )
+
+        return total_size
+
+    def viewProperties(self):
+        dir_total_size = self.__getDirectorySize( self )
+        return {
+            "name": self.name,
+            "creationDate": self.creationDate,
+            "number_items": len( self.files ) + len( self.directories ),
+            "total_size": dir_total_size
+        }
+    
+    def print_tree(self, directory, indent=0, tree: str = ""):
+        tree += (' ' * indent + f"[DIR] {directory.getDirectoryName()}\n")
+        for file in directory.getFiles().values():
+            tree += (' ' * (indent + 4) + f"[FILE] {file.name}.{file.extension}\n")
+        for subdirectory in directory.getDirectories().values():
+            tree = self.print_tree(subdirectory, indent + 4, tree)
+        return tree
             
