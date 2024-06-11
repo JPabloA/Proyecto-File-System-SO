@@ -28,6 +28,9 @@ class ShowTree_GUI(Toplevel):
         # Text input: Directory path
         entry_1 = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
         entry_1.place( x=9.0, y=10.0, width=722.0, height=33.0 )
+        entry_1.insert(0, "Desplegando árbol")
+        entry_1.config(state="disabled")
+
 
         # Button: Go back
         button_1 = Button( self, text="Volver", borderwidth=0, highlightthickness=0, command=self.destroy, relief="flat" )
@@ -37,3 +40,4 @@ class ShowTree_GUI(Toplevel):
         entry_2 = Text( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
         entry_2.insert(END, show_tree)
         entry_2.place( x=171.0, y=67.0, width=558.0, height=323.0 )
+        entry_2.config(state="disabled")

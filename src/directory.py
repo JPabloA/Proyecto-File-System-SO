@@ -45,6 +45,11 @@ class Directory:
 
         return search_result
 
+    def changeFileNameInDict(self, oldName, newName):
+        element = self.files.pop(oldName)
+        self.files[newName] = element
+        
+    
     def getFiles(self):
         return self.files
 

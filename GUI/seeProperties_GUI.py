@@ -46,12 +46,18 @@ class SeeProperties_GUI(Toplevel):
         self.entry_1 = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
         self.entry_1.insert(0, path_origin)
         self.entry_1.place( x=9.0, y=10.0, width=722.0, height=33.0 )
+        self.entry_1.config(state="disabled")
 
         # Text area: Display
         self.entry_2 = Text( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
         self.entry_2.insert(END, properties_print)
         self.entry_2.place( x=171.0, y=67.0, width=558.0, height=459.0 )
+        self.entry_2.config(state="disabled")
 
         # Button
-        self.button_1 = Button( self, text="Volver", borderwidth=0, highlightthickness=0, command=lambda: print("button_1 clicked"), relief="flat" )
+        self.button_1 = Button( self, text="Volver", borderwidth=0, highlightthickness=0, command=lambda: self.buttonFunction(), relief="flat" )
         self.button_1.place( x=9.0, y=67.0, width=149.0000762939453, height=49.0 )
+        
+    
+    def buttonFunction(self):
+        self.destroy()

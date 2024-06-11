@@ -81,6 +81,8 @@ class EditFile(Toplevel):
         #Name
         fullName = self.entry_1.get()
         fileName = self.getName(fullName)
+        
+        #! Validacion para verificar que los datos del entry (file name.extension) sean correctos
 
         #Name verification
         if not self.uniqueFileNameVerification(fileName):
@@ -112,11 +114,16 @@ class EditFile(Toplevel):
         self.parent.fileSystem.fat.freeFATEntries(self.file.fat_index)
         newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
 
+        # To update directory in case that the user modify file name or extension 
+        currentDirectory = self.parent.fileSystem.currentDirectory
+        currentDirectory.changeFileNameInDict(self.file.name + "." + self.file.extension, fullName)
+        
         # To update the file object
-        self.file.modifyContent(content)
+        self.file.modifyContent( fileName, extension, content)
+        
         self.file.assignSectors(newStartingIndex)
 
         print("Segunda tabla\n")
         self.parent.fileSystem.fat.printFAT()
-
+        self.parent.reloadFileSystem()
         self.destroy()

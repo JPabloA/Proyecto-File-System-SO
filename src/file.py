@@ -14,7 +14,14 @@ class File:
     # Functions
 
     # To modify the file content
-    def modifyContent(self, newContent):
+    def modifyContent(self, fileName, extension, newContent):
+        
+        if (fileName != self.name):
+            self.name = fileName
+        
+        if (extension != self.extension):
+            self.extension = extension
+            
         self.content = newContent
         self.modificationDate = datetime.datetime.now()
         self.size = len(newContent)
