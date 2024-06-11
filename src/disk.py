@@ -132,6 +132,7 @@ class Disk:
             else:
                 # Second: Remove the usused occupied space
                 self.removeFromDisk( sectors_list[ len( content_chunks ): ] )
+                return occupied_sectors
 
 
         # 5. Write the new content into disk
@@ -171,7 +172,6 @@ class Disk:
 
             disk_list[ sector_id ] = f"{sector_id}:{'0' * self.__sector_size}\n"
             self.__free_sectors[ sector_id ] = (sector_id, SectorState.FREE)
-
 
         # 2. Write the clear content into disk
         self.__listToDiskContent( disk_list )
