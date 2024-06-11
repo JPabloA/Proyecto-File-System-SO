@@ -101,9 +101,13 @@ class EditFile(Toplevel):
         oldSectorsList = self.parent.fileSystem.fat.getFileSectors(self.file.fat_index)
         print("------Estos son los sectores viejos -------", oldSectorsList)
         # To remove them from the disk
-        self.parent.fileSystem.disk.removeFromDisk(oldSectorsList)
+        #self.parent.fileSystem.disk.removeFromDisk(oldSectorsList)
+        
         # To write the new content
-        newSectorsList = self.parent.fileSystem.disk.writeToDisk(content)
+        newSectorsList = self.parent.fileSystem.disk.writeToDisk(content, oldSectorsList)
+        if (newSectorsList == []):
+            messagebox.showwarning("Modificaciones fallidas","No hay suficiente espacio en el disco para almacenar el archivo.")
+            return 
         # To free and update the FAT
         self.parent.fileSystem.fat.freeFATEntries(self.file.fat_index)
         newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
