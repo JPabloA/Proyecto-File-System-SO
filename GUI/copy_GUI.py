@@ -96,14 +96,18 @@ class CopyFiles(Toplevel):
         if not os.path.isfile(path_origin):
             print(f"El archivo en la ruta {path_origin} no existe.")
             return
-    
+        
         # Obtener el nombre del archivo y su extensión
-        file_name = os.path.basename(path_destiny)
+        file_name = os.path.basename(path_origin)
         nombre, extension = os.path.splitext(file_name)
         extension = extension.lstrip('.')  # Eliminar el punto inicial de la extensión
 
+        if not self.parent.isUniqueInDestinyDir( f"{file_name}.{extension}", "File", directory_destiny ):
+            messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
+            return
+
         # Leer el contenido del archivo
-        with open(path_destiny, 'r') as archivo:
+        with open(path_origin, 'r') as archivo:
             file_content = archivo.read()
 
         self.parent.fileSystem.createFile(nombre, extension, file_content, directory_destiny)
@@ -118,7 +122,7 @@ class CopyFiles(Toplevel):
             file_extension = self.selected_obj.extension
             file_content = self.selected_obj.content
 
-            if not self.parent.isUniqueInDestinyDir( f"{file_name}.{file_extension}", "File", path_destiny ):
+            if os.path.isfile(path_destiny):
                 messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
             else:
                 # Crear o sobrescribir el archivo en la ruta especificada
@@ -126,22 +130,22 @@ class CopyFiles(Toplevel):
                     archivo.write(file_content)  # Puedes escribir contenido en el archivo si lo deseas
                 print(f"Archivo creado en: {path_destiny}")
                 self.destroy()
-        else:
-            dir_name = self.selected_obj.name
+        # else:
+        #     dir_name = self.selected_obj.name
 
-            if not self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
-                messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
-            else:
-                try:
-                    # Crear el directorio y todos los directorios intermedios necesarios
-                    os.makedirs(path_destiny, exist_ok=True)
-                    print(f"Directorio creado en: {path_destiny}")
-                except OSError as e:
-                    print(f"Error al crear el directorio: {e}")
+        #     if not self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
+        #         messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
+        #     else:
+        #         try:
+        #             # Crear el directorio y todos los directorios intermedios necesarios
+        #             os.makedirs(path_destiny, exist_ok=True)
+        #             print(f"Directorio creado en: {path_destiny}")
+        #         except OSError as e:
+        #             print(f"Error al crear el directorio: {e}")
 
-                # Copy its content recursively
-                #self.__copy_DirectoryContentRecursively(self.selected_obj, path_destiny)
-                self.destroy()
+        #         # Copy its content recursively
+        #         #self.__copy_DirectoryContentRecursively(self.selected_obj, path_destiny)
+        #         self.destroy()
 
     def __copy_VirtualToVirtual(self):
         path_origin, path_destiny = self.__getInputPaths()
