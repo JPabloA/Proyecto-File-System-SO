@@ -4,7 +4,7 @@ from src.directory import Directory
 import os
 
 class CopyFiles(Toplevel):
-    def __init__(self, parent, selected_obj: File | Directory):
+    def __init__(self, parent, selected_obj: File | Directory = None):
         super().__init__(parent)
 
         self.parent = parent
@@ -12,15 +12,16 @@ class CopyFiles(Toplevel):
         self.isFile = True
 
         path_origin: str = ""
-        if isinstance(selected_obj, File):
-            path_origin = f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/{selected_obj.name}.{selected_obj.extension}"
-            self.isFile = True
-        elif isinstance(selected_obj, Directory):
-            path_origin = f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/{selected_obj.name}"
-            self.isFile = False
-        else:
-            print("Object could not be recognized")
-            return
+        if selected_obj is not None:
+            if isinstance(selected_obj, File):
+                path_origin = f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/{selected_obj.name}.{selected_obj.extension}"
+                self.isFile = True
+            elif isinstance(selected_obj, Directory):
+                path_origin = f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/{selected_obj.name}"
+                self.isFile = False
+            else:
+                print("Object could not be recognized")
+                return
 
         self.title("Copy Files")
         self.geometry("750x405")
@@ -62,6 +63,14 @@ class CopyFiles(Toplevel):
 
         canvas.create_text( 14.0, 19.0, anchor="nw", text="Copiar desde:", fill="#000000", font=("Inter", 16 * -1) )
         canvas.create_text( 14.0, 118.0, anchor="nw", text="Hasta:", fill="#000000", font=("Inter", 16 * -1) )
+
+        if self.parent.fileSystem.disk is None:
+            messagebox.showwarning("No se encontro ningún disco", "Asegúrese de crear un disco antes de copiar un archivo al file system")
+            self.entry_Origin.config( state="disabled" )
+            self.entry_Destiny.config( state="disabled" )
+            self.button_1.config( state="disabled" )
+            self.button_2.config( state="disabled" )
+            self.button_3.config( state="disabled" )
 
     def __getInputPaths(self):
         path_origin: str  = self.entry_Origin.get()
@@ -115,6 +124,10 @@ class CopyFiles(Toplevel):
         print(f"Archivo {file_name} copiado a la memoria virtual.")
 
     def __copy_VirtualToReal(self):
+        if self.selected_obj is None:
+            messagebox.showerror("No existe ningún objeto seleccionado", "La ruta ingresada no corresponde a ningún objeto dentro del file system")
+            return
+
         path_origin, path_destiny = self.__getInputPaths()
 
         if self.isFile:
@@ -151,6 +164,11 @@ class CopyFiles(Toplevel):
                 self.destroy()
 
     def __copy_VirtualToVirtual(self):
+
+        if self.selected_obj is None:
+            messagebox.showerror("No existe ningún objeto seleccionado", "La ruta ingresada no corresponde a ningún objeto dentro del file system")
+            return
+
         path_origin, path_destiny = self.__getInputPaths()
         directory_destiny: Directory = self.parent.fileSystem.navigateToDirectory( path_destiny )
 
