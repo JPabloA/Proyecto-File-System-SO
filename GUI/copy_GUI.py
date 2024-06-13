@@ -156,18 +156,30 @@ class CopyFiles(Toplevel):
         def copy_file_virtual_to_real(file, dest):
             file_name = f"{file.name}.{file.extension}"
             file_path = os.path.join(dest, file_name)
+
             if os.path.isfile(file_path):
-                messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
-                return
+                overwrite = messagebox.askyesno("Archivo existe en el destino", f"Existe un archivo con el nombre {file_name} en el destino. ¿Desea sobrescribirlo?")
+                if not overwrite:
+                    print(f"Omitido archivo {file_name}")
+                    return
+
             with open(file_path, 'w') as archivo:
                 archivo.write(file.content)
             print(f"Archivo {file_name} copiado a {file_path}")
 
         def copy_directory_virtual_to_real(directory, dest):
             dir_path = os.path.join(dest, directory.name)
+
             if os.path.isdir(dir_path):
-                messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
-                return
+                overwrite = messagebox.askyesno("Directorio existe en el destino", f"Existe un directorio con el nombre {directory.name} en el destino. ¿Desea sobrescribirlo?")
+                if not overwrite:
+                    print(f"Omitido directorio {directory.name}")
+                    return
+                else:
+                    # Remove the existing directory if the user chose to overwrite it
+                    import shutil
+                    shutil.rmtree(dir_path)
+
             os.makedirs(dir_path, exist_ok=True)
             print(f"Directorio {directory.name} creado en {dir_path}")
 
