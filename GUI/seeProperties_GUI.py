@@ -1,4 +1,4 @@
-from tkinter import Canvas, Entry, Text, Button, Toplevel, END
+from tkinter import Canvas, Entry, Text, Button, Toplevel, messagebox, END
 from src.file import File
 from src.directory import Directory
 
@@ -18,6 +18,7 @@ class SeeProperties_GUI(Toplevel):
             self.isFile = False
         else:
             print("Object could not be recognized")
+            messagebox.showwarning("Properties", "Object could not be recognized")
             return
 
         self.title("Propiedades Files")

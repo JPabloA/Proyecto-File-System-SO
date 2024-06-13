@@ -2,6 +2,7 @@ from .file import File
 from .directory import Directory
 from .disk import Disk
 from .fat import FAT
+from tkinter import messagebox
 
 class FileSystem:
 
@@ -73,6 +74,7 @@ class FileSystem:
         except:
             # TODO: Pasar a messageBox
            print("No es directorio o no se logró reconocer bien")
+           messagebox.showwarning("File System", "No es directorio o no se logró reconocer bien")
 
     def listDirectory(self):
         return self.currentDirectory.listDirectory()
@@ -89,6 +91,7 @@ class FileSystem:
                     selected_directory = selected_directory.directories[d_name]
                 except KeyError:
                     print("Bad path received")
+                    messagebox.showwarning("File System", "Bad path received")
                     return None
         return selected_directory
 
@@ -108,6 +111,7 @@ class FileSystem:
                 self.disk.removeFromDisk( sector_list )
             except:
                 print(f"File: {f_name} not found --- Continuing...")
+                messagebox.showwarning("File System", f"File: {f_name} not found --- Continuing...")
 
         # Remove all the directories in the current directory
         dirs_to_delete = list( current_dir.directories.keys() )
@@ -116,6 +120,7 @@ class FileSystem:
                 del current_dir.directories[ d_name ]
             except:
                 print(f"Dir: {d_name} not found --- Continuing...")
+                messagebox.showwarning("File System", f"Dir: {d_name} not found --- Continuing...")
 
     # Remove a file by its name/path
     def removeFile(self, file_name: str):

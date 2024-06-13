@@ -101,6 +101,7 @@ class CreateFile(Toplevel):
             self.parent.reloadFileSystem()
             self.destroy()
         else:
+            messagebox.showwarning("Create File", "Falta de extension")
             print("Falta de extension")
 
 

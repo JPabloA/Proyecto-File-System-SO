@@ -142,6 +142,7 @@ class CopyFiles(Toplevel):
         elif os.path.isdir(path_origin):
             copy_directory(path_origin, directory_destiny)
         else:
+            messagebox.showwarning("Copy", "Tipo de archivo no compatible")
             print("Tipo de archivo no compatible")
         self.parent.reloadFileSystem()
 
