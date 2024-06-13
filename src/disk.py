@@ -181,3 +181,6 @@ class Disk:
 
         # 2. Write the clear content into disk
         self.__listToDiskContent( disk_list )
+        
+    def getDiskUsedPercentage(self):    
+        return 1 // self.__num_sectors * len(self.__free_sectors) * 100
