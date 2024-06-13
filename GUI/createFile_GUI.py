@@ -96,14 +96,20 @@ class CreateFile(Toplevel):
         fileName = self.getName(fullName)
         extension = self.getExtension(fullName)
         content = self.entry_2.get("1.0", "end")
+        content = content.strip()
 
         if not fileName:
-            messagebox.showerror("Archivo sin nombre", "Falta el nombre del archivo")
+            messagebox.showwarning("Archivo sin nombre", "Falta el nombre del archivo. Favor ingresar el nombre del archivo")
             return
         if not extension:
-            messagebox.showerror("Archivo sin extensión", "Falta la extension del archivo")
+            messagebox.showwarning("Archivo sin extensión", "Falta la extension del archivo. Favor ingresar la extensión del archivo")
             return
 
+        # verif for content
+        if content == "":
+            messagebox.showwarning("Archivo sin contenido", "El archivo no puede quedar vacio. Favor ingresar contenido")
+            return
+        
         # Ask if user wants to overwrite the file content
         if not self.uniqueFileNameVerification(f"{fileName}.{extension}"):
             answer = messagebox.askyesno("Sobreescribir archivo", "Se encontró un archivo con el mismo nombre. ¿Desea sobreescribir su contenido?")

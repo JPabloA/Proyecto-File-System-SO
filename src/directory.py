@@ -14,6 +14,7 @@ class Directory:
     def createFile (self, fileName, fileExtension, fileContent):
         if fileName in self.files:
             messagebox.showwarning("Nombre debe ser unico", "Ya existe un archivo con el mismo nombre")
+            return
 
         newFile = File(fileName, fileExtension, fileContent)
         self.files[fileName] = newFile

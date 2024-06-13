@@ -38,6 +38,7 @@ class FileSystem:
         # Validacion sacarla a una nueva funcion por cuestiones de GUI
         if len(sectors_list) == 0:
             messagebox.showwarning("Espacio insuficiente en disco", "No hay suficiente espacio en disco para almacenar el archivo")
+            return
             #raise ValueError("File couldnt be assing on disk - Not enough space on disk")
 
         first_FAT_sector = self.fat.assingSectorList( sectors_list )
@@ -73,7 +74,6 @@ class FileSystem:
             self.currentDirectory = selectedDirectory
             self.path = new_path
         except:
-            # TODO: Pasar a messageBox
            messagebox.showwarning("File System", "No es directorio o no se logró reconocer bien")
 
     def listDirectory(self):
@@ -128,7 +128,7 @@ class FileSystem:
 
         if file_name not in selected_directory.files:
             messagebox.showwarning("Archivo no encontrado", "El archivo seleccionado no ha sido encontrado")
-            #raise ValueError ("File not found.")
+            return
 
         selected_file: File = selected_directory.files.pop( file_name )
         sector_list = self.fat.freeFATEntries( selected_file.fat_index )
@@ -144,7 +144,7 @@ class FileSystem:
 
         if dir_name not in selected_directory.directories:
             messagebox.showwarning("Directorio no encontrado", "El directorio seleccionado no ha sido encontrado.")
-            #raise ValueError ("Directory not found.")
+            return
 
         directory_to_remove: Directory = selected_directory.directories[dir_name]
         self.__clearDirectoryContent(directory_to_remove)
