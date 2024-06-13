@@ -90,7 +90,7 @@ class Move_GUI(Toplevel):
             return
 
         # To get the destiny directory (Remember that you need to add / as the final char to navigate correctly)
-        destiny_dir = self.parent.fileSystem.navigateToDirectory(dest_path)
+        destiny_dir: Directory = self.parent.fileSystem.navigateToDirectory(dest_path)
 
         # To verify that the path exists
         if destiny_dir == None:
@@ -106,12 +106,18 @@ class Move_GUI(Toplevel):
         # To verify that the object is unique in the destiny directory
         if objectType == objType.DIRECTORY:
             if not self.parent.isUniqueInDestinyDir(name, "Directory", dest_path):
-                messagebox.showwarning("Directorios con el mismo nombre", "Ya existe un directorio con el mismo nombre")
-                return
+                answer = messagebox.askyesno("Directorios con el mismo nombre", "Ya existe un directorio con el mismo nombre. ¿Desea sobreescribir su contenido?")
+                if answer:
+                    destiny_dir.removeDirectory( name )
+                else:
+                    return
         else:
             if not self.parent.isUniqueInDestinyDir(name, "File", dest_path):
-                messagebox.showwarning("Archivos con el mismo nombre", "Ya existe un archivo con el mismo nombre")
-                return
+                answer = messagebox.askyesno("Archivos con el mismo nombre", "Ya existe un archivo con el mismo nombre. ¿Desea sobreescribir su contenido?")
+                if answer:
+                    destiny_dir.removeFile( name )
+                else:
+                    return
 
         # To delete and add the file or directory from the current dir dictionary to the dest dir dictionary
         if objectType == objType.DIRECTORY:

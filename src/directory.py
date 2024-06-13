@@ -82,7 +82,7 @@ class Directory:
         dir_total_size = self.__getDirectorySize( self )
         return {
             "name": self.name,
-            "creationDate": self.creationDate,
+            "creationDate": self.creationDate.strftime("%Y-%m-%d %H:%M:%S"),
             "number_items": len( self.files ) + len( self.directories ),
             "total_size": dir_total_size
         }

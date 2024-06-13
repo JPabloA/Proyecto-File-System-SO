@@ -17,7 +17,6 @@ class SeeProperties_GUI(Toplevel):
             path_origin = f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/{object.name}"
             self.isFile = False
         else:
-            print("Object could not be recognized")
             messagebox.showwarning("Properties", "Object could not be recognized")
             return
 
@@ -39,9 +38,9 @@ class SeeProperties_GUI(Toplevel):
         
         properties = object.viewProperties()
         if self.isFile:
-            properties_print: str = f' name {properties["name"]},\n extension: {properties["extension"]},\n creationDate: {properties["creationDate"]},\n modificationDate: {properties["modificationDate"]},\n size: {properties["size"]}'
+            properties_print: str = f' Nombre del archivo {properties["name"]},\n Extensión: {properties["extension"]},\n Creado el: {properties["creationDate"]},\n Última modificación: {properties["modificationDate"]},\n Tamaño: {properties["size"]} bytes'
         else:
-            properties_print: str = f' name {properties["name"]},\n creationDate: {properties["creationDate"]},\n number_items: {properties["number_items"]},\n total_size: {properties["total_size"]}'
+            properties_print: str = f' Nombre del directorio {properties["name"]},\n Creado el: {properties["creationDate"]},\n Total de items: {properties["number_items"]},\n Tamaño total: {properties["total_size"]} bytes'
 
         # Text input: Search bar
         self.entry_1 = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )

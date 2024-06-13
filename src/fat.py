@@ -22,7 +22,6 @@ class FAT:
         table_entries_available = list(filter( lambda entry: entry[0] == -1, self.Table ))
 
         if len(sector_list) > len(table_entries_available):
-            print("FAT: Space not available in the file allocation table")
             messagebox.showwarning("FAT", "FAT: Space not available in the file allocation table")
             return -1
 
@@ -33,7 +32,6 @@ class FAT:
                 break
 
         if first_table_entry == -1:
-            print("FAT ERROR: This is not supposed to happen -> Not allocating anything")
             messagebox.showwarning("FAT", "FAT ERROR: This is not supposed to happen -> Not allocating anything")
             return
 

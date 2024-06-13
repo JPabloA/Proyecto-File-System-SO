@@ -6,7 +6,7 @@ import GUI.createDisk_GUI as createDisk_GUI
 import GUI.copy_GUI as copy_GUI
 import GUI.createFile_GUI as createFile_GUI
 import GUI.editFile_GUI as editFile_GUI
-from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu, messagebox, ttk
+from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu, messagebox, ttk, IntVar, EXTENDED, ACTIVE
 
 from src.FileSystem import FileSystem
 from src.file import File
@@ -56,7 +56,7 @@ class FileSystem_GUI(Tk):
         self.textInput_SearchBar.place( x=9.0, y=465.0, width=150.0, height=30.0 )
 
         # Text area: Display
-        self.textArea_Display = Listbox( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, selectmode=SINGLE, font="Arial 14" )
+        self.textArea_Display = Listbox( bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0, selectmode=EXTENDED, font="Arial 14" )
         self.textArea_Display.place( x=173.0, y=72.0, width=558.0, height=459.0 )
         self.textArea_Display.bind("<Button-3>", lambda event: self.__contentDisplayRightClick(event))
         self.textArea_Display.bind("<Double-Button-1>", self.__onFSDoubleClick)
@@ -89,11 +89,14 @@ class FileSystem_GUI(Tk):
         # Progress bar (Disk state)
         canvas.create_text( 9, 270.0, anchor="nw", text="Espacio ocupado", fill="#000000", font=("Inter", 13 * -1) )
 
-        self.progressbar = ttk.Progressbar(length=150)
+        self.progressbar_value = IntVar()
+        self.progressbar = ttk.Progressbar(length=150, variable=self.progressbar_value)
         self.progressbar.place(x=9.0, y=290.0, height=17)
 
     def updateDiskState(self):
-        self.progressbar.step()
+        if self.fileSystem.disk:
+            value: int = self.fileSystem.disk.getDiskUsedPercentage()
+            self.progressbar_value.set( value )
 
     def __goBackDirectory(self):
         current_path = self.fileSystem.getCurrentWorkingDirectory()
@@ -176,6 +179,10 @@ class FileSystem_GUI(Tk):
     def __contentDisplayRightClick(self, event):
         isFile: bool = True
         # Get the selected file/directory
+
+        # TODO: Remove en lista
+        # print( "active",[ self.textArea_Display.get(i) for i in self.textArea_Display.curselection() ] )
+
         try:
             index = self.textArea_Display.nearest(event.y)
             self.textArea_Display.select_clear(0, END)
@@ -183,6 +190,7 @@ class FileSystem_GUI(Tk):
             selected_item: str = self.textArea_Display.get( index )
         except IndexError:
             return
+
 
         request_obj: File | Directory = None
         obj_content: str = ""
@@ -315,16 +323,13 @@ class FileSystem_GUI(Tk):
         destinyDirectory: Directory
         destinyDirectory = self.fileSystem.navigateToDirectory(destinyPath)
 
-        # Verification to see if the path exists
-        if destinyDirectory == None:
-            messagebox.showwarning("Ruta no encontrada", "Favor ingresar una ruta correcta")
-
         if type == "File":
             return not name in destinyDirectory.files
         else:
             return not name in destinyDirectory.directories
 
     def reloadFileSystem(self):
+        self.updateDiskState()
         self.__loadCurrentWorkingDirectory()
         self.__loadContentInFSDisplay()
 

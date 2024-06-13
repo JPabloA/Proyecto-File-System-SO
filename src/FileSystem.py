@@ -74,7 +74,6 @@ class FileSystem:
             self.path = new_path
         except:
             # TODO: Pasar a messageBox
-           print("No es directorio o no se logró reconocer bien")
            messagebox.showwarning("File System", "No es directorio o no se logró reconocer bien")
 
     def listDirectory(self):
@@ -91,8 +90,6 @@ class FileSystem:
                 try:
                     selected_directory = selected_directory.directories[d_name]
                 except KeyError:
-                    print("Bad path received")
-                    messagebox.showwarning("File System", "Bad path received")
                     return None
         return selected_directory
 
@@ -111,7 +108,6 @@ class FileSystem:
                 sector_list = self.fat.freeFATEntries( selected_file.fat_index )
                 self.disk.removeFromDisk( sector_list )
             except:
-                print(f"File: {f_name} not found --- Continuing...")
                 messagebox.showwarning("File System", f"File: {f_name} not found --- Continuing...")
 
         # Remove all the directories in the current directory
@@ -120,7 +116,6 @@ class FileSystem:
             try:
                 del current_dir.directories[ d_name ]
             except:
-                print(f"Dir: {d_name} not found --- Continuing...")
                 messagebox.showwarning("File System", f"Dir: {d_name} not found --- Continuing...")
 
     # Remove a file by its name/path

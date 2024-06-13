@@ -95,7 +95,14 @@ class CreateFile(Toplevel):
         fullName = self.entry_1.get()
         fileName = self.getName(fullName)
         extension = self.getExtension(fullName)
-        content = self.entry_2.get("1.0", "end").strip()
+        content = self.entry_2.get("1.0", "end")
+
+        if not fileName:
+            messagebox.showerror("Archivo sin nombre", "Falta el nombre del archivo")
+            return
+        if not extension:
+            messagebox.showerror("Archivo sin extensión", "Falta la extension del archivo")
+            return
 
         # Ask if user wants to overwrite the file content
         if not self.uniqueFileNameVerification(f"{fileName}.{extension}"):
@@ -122,8 +129,5 @@ class CreateFile(Toplevel):
             self.parent.reloadFileSystem()
             self.parent.updateDiskState()
             self.destroy()
-        else:
-            messagebox.showerror("Create File", "Falta de extension")
-            print("Falta de extension")
 
 

@@ -102,33 +102,52 @@ class CopyFiles(Toplevel):
         path_origin, path_destiny = self.__getInputPaths()
         directory_destiny = self.parent.fileSystem.navigateToDirectory(path_destiny)
 
+        if directory_destiny is None:
+            messagebox.showerror("Directorio destino no existe", "El directorio de destino no pudo ser encontrado, por favor ingrese una ruta válida")
+            return
+
         def copy_file(src, dest_dir):
             file_name = os.path.basename(src)
             name, extension = os.path.splitext(file_name)
             extension = extension.lstrip('.')
 
-            if not self.parent.isUniqueInDestinyDir(f"{name}.{extension}", "File", path_destiny):
-                messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
-                return
-
             with open(src, 'r') as archivo:
                 file_content = archivo.read()
 
-            try:
-                self.parent.fileSystem.createFile(name, extension, file_content, dest_dir)
-                print(f"Archivo {file_name} copiado a la memoria virtual.")
-            except ValueError as e:
-                messagebox.showerror("Error al copiar archivo", str(e))
+            if not self.parent.isUniqueInDestinyDir(f"{name}.{extension}", "File", path_destiny):
+                answer = messagebox.askyesno("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino. ¿Desea sobreescribir su contenido?")
+                if answer:
+                    selected_file: File = self.parent.getFileObj( f"{name}.{extension}", path_destiny )
+
+                    oldSectorsList = self.parent.fileSystem.fat.getFileSectors( selected_file.fat_index )
+                    newSectorsList = self.parent.fileSystem.disk.writeToDisk( file_content, oldSectorsList )
+                    if (newSectorsList == []):
+                        return
+                    self.parent.fileSystem.fat.freeFATEntries( selected_file.fat_index )
+                    newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
+
+                    selected_file.modifyContent( name, extension, file_content )
+                    selected_file.assignSectors( newStartingIndex )
+            else:
+                try:
+                    self.parent.fileSystem.createFile(name, extension, file_content, dest_dir)
+                    # TODO: Reemplazar por mensaje en messagebox (Exito de copiado)
+                except ValueError as e:
+                    messagebox.showerror("Error al copiar archivo", str(e))
 
         def copy_directory(src, dest_dir):
             dir_name = os.path.basename(os.path.normpath(src))
 
             if not self.parent.isUniqueInDestinyDir(dir_name, "Directory", path_destiny):
-                messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
-                return
+                answer = messagebox.askyesno("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino. ¿Desea sobreescribir su contenido?")
+                if answer:
+                    selected_dir: Directory = self.parent.getDirObj( dir_name, path_destiny )
+                    selected_dir.clearDirectory()
+
+                    directory_destiny.directories.pop( dir_name )
 
             new_directory = self.parent.fileSystem.createDirectory(dir_name, dest_dir)
-            print(f"Directorio {dir_name} copiado a la memoria virtual.")
+            # TODO: Reemplazar por mensaje en messagebox (Exito de copiado)
 
             for item in os.listdir(src):
                 item_path = os.path.join(src, item)
@@ -143,7 +162,6 @@ class CopyFiles(Toplevel):
             copy_directory(path_origin, directory_destiny)
         else:
             messagebox.showwarning("Copy", "Tipo de archivo no compatible")
-            print("Tipo de archivo no compatible")
 
         self.parent.updateDiskState()
         self.parent.reloadFileSystem()
@@ -167,7 +185,7 @@ class CopyFiles(Toplevel):
 
             with open(file_path, 'w') as archivo:
                 archivo.write(file.content)
-            print(f"Archivo {file_name} copiado a {file_path}")
+            # TODO: Reemplazar por mensaje en messagebox (Exito de copiado)
 
         def copy_directory_virtual_to_real(directory, dest):
             dir_path = os.path.join(dest, directory.name)
@@ -183,7 +201,7 @@ class CopyFiles(Toplevel):
                     shutil.rmtree(dir_path)
 
             os.makedirs(dir_path, exist_ok=True)
-            print(f"Directorio {directory.name} creado en {dir_path}")
+            # TODO: Reemplazar por mensaje en messagebox (Exito de copiado)
 
             for file in directory.getFiles().values():
                 copy_file_virtual_to_real(file, dir_path)
@@ -217,7 +235,19 @@ class CopyFiles(Toplevel):
             file_content = self.selected_obj.content
 
             if not self.parent.isUniqueInDestinyDir( f"{file_name}.{file_extension}", "File", path_destiny ):
-                messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
+                answer = messagebox.askyesno("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino. ¿Desea sobreescribir su contenido?")
+                if answer:
+                    selected_file: File = self.parent.getFileObj( f"{file_name}.{file_extension}", path_destiny )
+
+                    oldSectorsList = self.parent.fileSystem.fat.getFileSectors( selected_file.fat_index )
+                    newSectorsList = self.parent.fileSystem.disk.writeToDisk( file_content, oldSectorsList )
+                    if (newSectorsList == []):
+                        return
+                    self.parent.fileSystem.fat.freeFATEntries( selected_file.fat_index )
+                    newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
+
+                    selected_file.modifyContent( file_name, file_extension, file_content )
+                    selected_file.assignSectors( newStartingIndex )
             else:
                 self.parent.fileSystem.createFile( file_name, file_extension, file_content, directory_destiny )
                 self.parent.updateDiskState()
@@ -226,12 +256,17 @@ class CopyFiles(Toplevel):
             dir_name = self.selected_obj.name
 
             if not self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
-                messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
-            else:
-                # Create the directory in its destiny
-                directory_destiny = self.parent.fileSystem.createDirectory( dir_name, directory_destiny )
+                answer = messagebox.askyesno("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino. ¿Desea sobreescribir su contenido?")
+                if answer:
+                    selected_dir: Directory = self.parent.getDirObj( dir_name, path_destiny )
+                    selected_dir.clearDirectory()
 
-                # Copy its content recursively
-                self.__copy_DirectoryContentRecursively(self.selected_obj, directory_destiny)
-                self.parent.updateDiskState()
-                self.destroy()
+                    directory_destiny.directories.pop( dir_name )
+
+            # Create the directory in its destiny
+            directory_destiny = self.parent.fileSystem.createDirectory( dir_name, directory_destiny )
+
+            # Copy its content recursively
+            self.__copy_DirectoryContentRecursively(self.selected_obj, directory_destiny)
+            self.parent.updateDiskState()
+            self.destroy()

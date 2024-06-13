@@ -36,8 +36,8 @@ class File:
         return {
             "name": self.name,
             "extension": self.extension,
-            "creationDate": self.creationDate,
-            "modificationDate": self.modificationDate,
+            "creationDate": self.creationDate.strftime("%Y-%m-%d %H:%M:%S"),
+            "modificationDate": self.modificationDate.strftime("%Y-%m-%d %H:%M:%S"),
             "size": self.size
             }
 

@@ -40,14 +40,14 @@ class Disk:
     # Private: Divide the content in string chunks of the size of a sector
     def __splitContentInChunks(self, content):
         content_chunks: list[str] = [content[i:i + self.__sector_size] for i in range(0, len(content), self.__sector_size)]
-        
+
         if content_chunks:
             # To remove line jump
             content_chunks[-1] = content_chunks[-1].strip()
 
             # Fill the last sector with non-use space (Intern Fragmentation)
             content_chunks[-1] = content_chunks[-1].ljust(self.__sector_size, "0")
-        
+
         return content_chunks
 
     # Create the virtual disk file
@@ -78,7 +78,6 @@ class Disk:
             sectors_required  = len(content_chunks)
 
             if (sectors_required > len(sectors_available)):
-                print("Write: Space requested not available")
                 messagebox.showwarning("Modificaciones fallidas","No hay suficiente espacio en el disco para almacenar el archivo.")
                 return []
 
@@ -101,7 +100,6 @@ class Disk:
             sectors_required = len(content_chunks) - len(sectors_list)
 
             if (sectors_required > 0 and sectors_required > len(sectors_available)):
-                print("Write: Space requested not available")
                 messagebox.showwarning("Modificaciones fallidas","No hay suficiente espacio en el disco para almacenar el archivo.")
                 return []
 
@@ -172,7 +170,6 @@ class Disk:
         # 1. Write the data from the sectors list
         for sector_id in sectors_list:
             if sector_id < 0 or sector_id >= self.__num_sectors:
-                print(f"Sector ID {sector_id} out of bounds")
                 messagebox.showwarning("Virtual disk!", f"Sector ID {sector_id} out of bounds")
                 continue
 
@@ -181,6 +178,9 @@ class Disk:
 
         # 2. Write the clear content into disk
         self.__listToDiskContent( disk_list )
-        
-    def getDiskUsedPercentage(self):    
-        return 1 // self.__num_sectors * len(self.__free_sectors) * 100
+
+    def getDiskUsedPercentage(self):
+        sectors_available = list( filter(lambda s: s[1] == SectorState.FREE, self.__free_sectors) )
+        x = self.__num_sectors * len( sectors_available )
+        value = ((1 - (1 / self.__num_sectors) * len( sectors_available )) * 100) if x > 0 else 99.9
+        return value
