@@ -1,4 +1,5 @@
 from enum import Enum
+from tkinter import messagebox
 
 class SectorState(Enum):
     FREE = 0
@@ -78,6 +79,7 @@ class Disk:
 
             if (sectors_required > len(sectors_available)):
                 print("Write: Space requested not available")
+                messagebox.showwarning("Virtual disk!", "Write: Space requested not available")
                 return []
 
             # 4. Get the sectors to be written
@@ -100,6 +102,7 @@ class Disk:
 
             if (sectors_required > 0 and sectors_required > len(sectors_available)):
                 print("Write: Space requested not available")
+                messagebox.showwarning("Virtual disk!", "Write: Space requested not available")
                 return []
 
             # 4. Get the sectors to be written
@@ -170,6 +173,7 @@ class Disk:
         for sector_id in sectors_list:
             if sector_id < 0 or sector_id >= self.__num_sectors:
                 print(f"Sector ID {sector_id} out of bounds")
+                messagebox.showwarning("Virtual disk!", f"Sector ID {sector_id} out of bounds")
                 continue
 
             disk_list[ sector_id ] = f"{sector_id}:{'0' * self.__sector_size}\n"

@@ -1,4 +1,4 @@
-
+from tkinter import messagebox
 class FAT:
     Table: list[ tuple[ int, int ] ]
 
@@ -23,6 +23,7 @@ class FAT:
 
         if len(sector_list) > len(table_entries_available):
             print("FAT: Space not available in the file allocation table")
+            messagebox.showwarning("FAT", "FAT: Space not available in the file allocation table")
             return -1
 
         # Get the first available FAT entry
@@ -33,6 +34,7 @@ class FAT:
 
         if first_table_entry == -1:
             print("FAT ERROR: This is not supposed to happen -> Not allocating anything")
+            messagebox.showwarning("FAT", "FAT ERROR: This is not supposed to happen -> Not allocating anything")
             return
 
         table_index = first_table_entry
