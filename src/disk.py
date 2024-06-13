@@ -79,7 +79,7 @@ class Disk:
 
             if (sectors_required > len(sectors_available)):
                 print("Write: Space requested not available")
-                messagebox.showwarning("Virtual disk!", "Write: Space requested not available")
+                messagebox.showwarning("Modificaciones fallidas","No hay suficiente espacio en el disco para almacenar el archivo.")
                 return []
 
             # 4. Get the sectors to be written
@@ -102,7 +102,7 @@ class Disk:
 
             if (sectors_required > 0 and sectors_required > len(sectors_available)):
                 print("Write: Space requested not available")
-                messagebox.showwarning("Virtual disk!", "Write: Space requested not available")
+                messagebox.showwarning("Modificaciones fallidas","No hay suficiente espacio en el disco para almacenar el archivo.")
                 return []
 
             # 4. Get the sectors to be written

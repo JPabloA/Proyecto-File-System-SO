@@ -107,8 +107,8 @@ class EditFile(Toplevel):
         # To write the new content
         newSectorsList = self.parent.fileSystem.disk.writeToDisk(content, oldSectorsList)
         if (newSectorsList == []):
-            messagebox.showwarning("Modificaciones fallidas","No hay suficiente espacio en el disco para almacenar el archivo.")
             return 
+        
         # To free and update the FAT
         self.parent.fileSystem.fat.freeFATEntries(self.file.fat_index)
         newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
