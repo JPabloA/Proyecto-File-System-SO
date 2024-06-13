@@ -14,7 +14,7 @@ class Directory:
     def createFile (self, fileName, fileExtension, fileContent):
         if fileName in self.files:
             messagebox.showwarning("Nombre debe ser unico", "Ya existe un archivo con el mismo nombre")
-                             
+
         newFile = File(fileName, fileExtension, fileContent)
         self.files[fileName] = newFile
 
@@ -50,22 +50,25 @@ class Directory:
     def changeFileNameInDict(self, oldName, newName):
         element = self.files.pop(oldName)
         self.files[newName] = element
-        
-    
+
+    def clearDirectory(self):
+        self.directories = {}
+        self.files = {}
+
     def getFiles(self):
         return self.files
 
     def getDirectories(self):
         return self.directories
-    
+
     def removeDirectory(self, name):
         if name in self.directories:
             self.directories.pop(name)
-    
+
     def removeFile(self, name):
         if name in self.files:
             self.files.pop(name)
-    
+
     def __getDirectorySize(self, selected_dir, total_size: int = 0):
         for file in selected_dir.files.values():
             total_size += file.size
@@ -83,7 +86,7 @@ class Directory:
             "number_items": len( self.files ) + len( self.directories ),
             "total_size": dir_total_size
         }
-    
+
     def print_tree(self, directory, indent=0, tree: str = ""):
         tree += (' ' * indent + f"[DIR] {directory.getDirectoryName()}\n")
         for file in directory.getFiles().values():
@@ -91,4 +94,3 @@ class Directory:
         for subdirectory in directory.getDirectories().values():
             tree = self.print_tree(subdirectory, indent + 4, tree)
         return tree
-            

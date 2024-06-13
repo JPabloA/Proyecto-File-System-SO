@@ -144,6 +144,8 @@ class CopyFiles(Toplevel):
         else:
             messagebox.showwarning("Copy", "Tipo de archivo no compatible")
             print("Tipo de archivo no compatible")
+
+        self.parent.updateDiskState()
         self.parent.reloadFileSystem()
 
     def __copy_VirtualToReal(self):
@@ -180,6 +182,8 @@ class CopyFiles(Toplevel):
             copy_file_virtual_to_real(self.selected_obj, path_destiny)
         else:
             copy_directory_virtual_to_real(self.selected_obj, path_destiny)
+
+        self.parent.updateDiskState()
         self.parent.reloadFileSystem()
 
     def __copy_VirtualToVirtual(self):
@@ -204,6 +208,7 @@ class CopyFiles(Toplevel):
                 messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
             else:
                 self.parent.fileSystem.createFile( file_name, file_extension, file_content, directory_destiny )
+                self.parent.updateDiskState()
                 self.destroy()
         else:
             dir_name = self.selected_obj.name
@@ -216,5 +221,5 @@ class CopyFiles(Toplevel):
 
                 # Copy its content recursively
                 self.__copy_DirectoryContentRecursively(self.selected_obj, directory_destiny)
+                self.parent.updateDiskState()
                 self.destroy()
-                

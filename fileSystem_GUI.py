@@ -6,7 +6,7 @@ import GUI.createDisk_GUI as createDisk_GUI
 import GUI.copy_GUI as copy_GUI
 import GUI.createFile_GUI as createFile_GUI
 import GUI.editFile_GUI as editFile_GUI
-from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu, messagebox
+from tkinter import SINGLE, END, Tk, Canvas, Entry, Button, Listbox, Menu, messagebox, ttk
 
 from src.FileSystem import FileSystem
 from src.file import File
@@ -85,6 +85,15 @@ class FileSystem_GUI(Tk):
 
         button_5 = Button( text="Buscar", borderwidth=0, command=self.__onSearchRequest, relief="flat" )
         button_5.place( x=9.0, y=503.0, width=150.0, height=30.0 )
+
+        # Progress bar (Disk state)
+        canvas.create_text( 9, 270.0, anchor="nw", text="Espacio ocupado", fill="#000000", font=("Inter", 13 * -1) )
+
+        self.progressbar = ttk.Progressbar(length=150)
+        self.progressbar.place(x=9.0, y=290.0, height=17)
+
+    def updateDiskState(self):
+        self.progressbar.step()
 
     def __goBackDirectory(self):
         current_path = self.fileSystem.getCurrentWorkingDirectory()

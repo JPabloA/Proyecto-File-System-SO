@@ -40,10 +40,14 @@ class CreateDirectory_GUI(Toplevel):
         created_dir: Directory | None = self.parent.fileSystem.createDirectory( directory_name )
 
         if created_dir is None:
-            messagebox.showerror("Directorio con el mismo nombre", "Se encontró un directorio con el mismo nombre, por favor, coloque otro nombre")
-        else:
-            self.parent.reloadFileSystem()
-            self.destroy()
+            answer = messagebox.askyesno("Sobreescribir directorio", "Se encontró un directorio con el mismo nombre. ¿Desea sobreescribir su contenido?")
+            if answer:
+                selected_dir: Directory = self.parent.getDirObj( directory_name )
+                selected_dir.clearDirectory()
+            else:
+                return
+        self.parent.reloadFileSystem()
+        self.destroy()
 
 
 
