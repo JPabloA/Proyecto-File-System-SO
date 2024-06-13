@@ -54,7 +54,6 @@ class CreateFile(Toplevel):
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_2.insert("1.0", "Contenido")
         self.entry_2.place( x=155.00, y=130.00, width=570, height=400 )
 
     def getExtension(self, name):
