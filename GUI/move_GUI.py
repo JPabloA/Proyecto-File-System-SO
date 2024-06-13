@@ -103,7 +103,7 @@ class Move_GUI(Toplevel):
                 messagebox.showwarning("Directorios con el mismo nombre", "Ya existe un directorio con el mismo nombre")
                 return
         else:
-            if not self.parent.isUniqueInDestinyDir(self.object.name  + "." + self.object.extension, "File", dest_path):
+            if not self.parent.isUniqueInDestinyDir(name, "File", dest_path):
                 messagebox.showwarning("Archivos con el mismo nombre", "Ya existe un archivo con el mismo nombre")
                 return
 
