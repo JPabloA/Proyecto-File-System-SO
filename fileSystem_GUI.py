@@ -164,7 +164,6 @@ class FileSystem_GUI(Tk):
             self.fileSystem.changeDirectory( obj_path )
             self.reloadFileSystem()
 
-
     def __contentDisplayRightClick(self, event):
         isFile: bool = True
         # Get the selected file/directory
@@ -196,8 +195,8 @@ class FileSystem_GUI(Tk):
 
         menu.add_command(label="Abrir", font="Arial 12", command= lambda: self.__openSelectedObject( request_obj, obj_content, selected_path, isFile ))
         menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_item ))
-        menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( request_obj ))
-        menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI ( request_obj ))
+        menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( request_obj, selected_path ))
+        menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI ( request_obj, selected_path ))
         menu.add_command(label="Ver propiedades", font="Arial 12", command= lambda: self.display_seeProperties( request_obj ))
 
         try:
@@ -236,7 +235,7 @@ class FileSystem_GUI(Tk):
                 print("__deleteFunction: Object not recognized")
                 return
 
-            self.__loadContentInFSDisplay()
+            self.reloadFileSystem()
 
         else:
             print ("Cancelando eliminacion")
@@ -253,10 +252,10 @@ class FileSystem_GUI(Tk):
         window = createDisk_GUI.CreateDisk_GUI(self)
         window.grab_set()
 
-    def display_Move_GUI(self, object):
+    def display_Move_GUI(self, object, selected_path: str):
         if object is None:
             return
-        window = move_GUI.Move_GUI(self, object)
+        window = move_GUI.Move_GUI(self, object, selected_path)
         window.deiconify()
         window.update_idletasks()
         window.grab_set()
@@ -267,8 +266,8 @@ class FileSystem_GUI(Tk):
         window = seeProperties_GUI.SeeProperties_GUI(self, object)
         window.grab_set()
 
-    def display_Copy_GUI(self, selected_obj: File | Directory):
-        window = copy_GUI.CopyFiles(self, selected_obj)
+    def display_Copy_GUI(self, selected_obj: File | Directory, selected_path: str):
+        window = copy_GUI.CopyFiles(self, selected_obj, selected_path)
         window.grab_set()
 
     def display_CreateFile_GUI(self):

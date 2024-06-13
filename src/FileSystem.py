@@ -74,19 +74,6 @@ class FileSystem:
             # TODO: Pasar a messageBox
            print("No es directorio o no se logró reconocer bien")
 
-    # def changeDirectory(self, directory_name: str, goBack: bool = False):
-    #     try:
-    #         if goBack and self.currentDirectory.parent_directory != None:
-    #             self.path = self.path.rsplit("/", 1)[0]
-    #             self.currentDirectory = self.currentDirectory.parent_directory
-    #         elif not goBack:
-    #             selected_directory: Directory = self.currentDirectory.directories[ directory_name ]
-    #             self.path += f"/{directory_name}"
-    #             self.currentDirectory = selected_directory
-    #     except:
-    #        # TODO: Pasar a messageBox
-    #        print("No es directorio o no se logró reconocer bien")
-
     def listDirectory(self):
         return self.currentDirectory.listDirectory()
 
