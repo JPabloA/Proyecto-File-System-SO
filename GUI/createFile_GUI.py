@@ -70,14 +70,14 @@ class CreateFile(Toplevel):
     def diskVerification(self):
         if not self.parent.fileSystem.disk == None:
             return True
-        messagebox.showwarning("Disco no encontrado","Disco no creado. Favor crear un disco antes de intentar crear un archivo")
+        messagebox.showerror("Disco no encontrado","Disco no creado. Favor crear un disco antes de intentar crear un archivo")
         return False
 
 
     def uniqueFileNameVerification(self, fileName):
         if not fileName in self.parent.fileSystem.currentDirectory.files:
             return True
-        messagebox.showwarning("Archivo con mismo nombre","Se ha encontrado un archivo con el mismo nombre. Favor ingresar un nombre diferente al archivo.")
+        messagebox.showerror("Archivo con mismo nombre","Se ha encontrado un archivo con el mismo nombre. Favor ingresar un nombre diferente al archivo.")
         return False
 
     # TODO: Validaciones necesarias para asegurar que el nombre sea apto
@@ -100,7 +100,7 @@ class CreateFile(Toplevel):
             self.parent.reloadFileSystem()
             self.destroy()
         else:
-            messagebox.showwarning("Create File", "Falta de extension")
+            messagebox.showerror("Create File", "Falta de extension")
             print("Falta de extension")
 
 
