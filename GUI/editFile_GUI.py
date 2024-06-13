@@ -65,7 +65,6 @@ class EditFile(Toplevel):
         if len(parts) > 1:
             return parts[-1]
         else:
-            print("Falta ingresar la extension de la vara de la vara")
             return ""
 
     def uniqueFileNameVerification(self, fileName):

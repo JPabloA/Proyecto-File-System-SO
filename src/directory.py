@@ -1,5 +1,6 @@
 import datetime
 from .file import File
+from tkinter import messagebox
 
 
 class Directory:
@@ -12,7 +13,8 @@ class Directory:
     # To create a file in the directory
     def createFile (self, fileName, fileExtension, fileContent):
         if fileName in self.files:
-            raise ValueError("A file with this name already exists.")
+            messagebox.showwarning("Nombre debe ser unico", "Ya existe un archivo con el mismo nombre")
+                             
         newFile = File(fileName, fileExtension, fileContent)
         self.files[fileName] = newFile
 
