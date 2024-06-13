@@ -115,7 +115,7 @@ class CopyFiles(Toplevel):
 
             print(f"Archivo {file_name} copiado a la memoria virtual.")
         
-        if os.path.isdir(path_origin):
+        elif os.path.isdir(path_origin):
             dir_name = os.path.basename(os.path.normpath(path_origin))
 
             if not self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
