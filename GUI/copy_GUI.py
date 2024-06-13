@@ -4,7 +4,7 @@ from src.directory import Directory
 import os
 
 class CopyFiles(Toplevel):
-    def __init__(self, parent, selected_obj: File | Directory = None):
+    def __init__(self, parent, selected_obj: File | Directory = None, selected_path: str = ""):
         super().__init__(parent)
 
         self.parent = parent
@@ -14,10 +14,10 @@ class CopyFiles(Toplevel):
         path_origin: str = ""
         if selected_obj is not None:
             if isinstance(selected_obj, File):
-                path_origin = f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/{selected_obj.name}.{selected_obj.extension}"
+                path_origin = (selected_path if selected_path else f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/") + f"{selected_obj.name}.{selected_obj.extension}"
                 self.isFile = True
             elif isinstance(selected_obj, Directory):
-                path_origin = f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/{selected_obj.name}"
+                path_origin = (selected_path if selected_path else f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/") + f"{selected_obj.name}"
                 self.isFile = False
             else:
                 print("Object could not be recognized")
