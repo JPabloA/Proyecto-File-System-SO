@@ -2,6 +2,7 @@ from .file import File
 from .directory import Directory
 from .disk import Disk
 from .fat import FAT
+from tkinter import messagebox
 
 class FileSystem:
 
@@ -36,7 +37,8 @@ class FileSystem:
 
         # Validacion sacarla a una nueva funcion por cuestiones de GUI
         if len(sectors_list) == 0:
-            raise ValueError("File couldnt be assing on disk - Not enough space on disk")
+            messagebox.showwarning("Espacio insuficiente en disco", "No hay suficiente espacio en disco para almacenar el archivo")
+            #raise ValueError("File couldnt be assing on disk - Not enough space on disk")
 
         first_FAT_sector = self.fat.assingSectorList( sectors_list )
 
@@ -139,7 +141,8 @@ class FileSystem:
         file_name = file_name.split("/")[-1]
 
         if file_name not in selected_directory.files:
-            raise ValueError ("File not found.")
+            messagebox.showwarning("Archivo no encontrado", "El archivo seleccionado no ha sido encontrado")
+            #raise ValueError ("File not found.")
 
         selected_file: File = selected_directory.files.pop( file_name )
         sector_list = self.fat.freeFATEntries( selected_file.fat_index )
@@ -154,7 +157,8 @@ class FileSystem:
         dir_name = dir_name.split("/")[-1]
 
         if dir_name not in selected_directory.directories:
-            raise ValueError ("Directory not found.")
+            messagebox.showwarning("Directorio no encontrado", "El directorio seleccionado no ha sido encontrado.")
+            #raise ValueError ("Directory not found.")
 
         directory_to_remove: Directory = selected_directory.directories[dir_name]
         self.__clearDirectoryContent(directory_to_remove)

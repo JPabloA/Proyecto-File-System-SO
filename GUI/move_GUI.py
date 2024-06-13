@@ -76,12 +76,15 @@ class Move_GUI(Toplevel):
 
         print("Este es el dest path: ", dest_path)
         currentDirectory = self.parent.fileSystem.currentDirectory
-
-
+        
         if isinstance(self.object, Directory):
             objectType = objType.DIRECTORY #!Directory
         else: #!File
             objectType = objType.FILE
+            
+        if self.getExtension(name) == "":
+            messagebox.showwarning("Falta la extension", "No se ha ingresado ninguna extension del archivo.")
+            return
 
         # To get the destiny directory (Remember that you need to add / as the final char to navigate correctly)
         destiny_dir = self.parent.fileSystem.navigateToDirectory(dest_path)
@@ -133,3 +136,10 @@ class Move_GUI(Toplevel):
         self.parent.reloadFileSystem()
         self.destroy()
 
+    def getExtension(self, name):
+        parts = name.split(".")
+        if len(parts) > 1:
+            return parts[-1]
+        else:
+            print("Falta ingresar la extension de la vara de la vara")
+            return ""
