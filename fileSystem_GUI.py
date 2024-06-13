@@ -155,13 +155,14 @@ class FileSystem_GUI(Tk):
         return selected_path, selected_objt
 
     def __openSelectedObject(self, request_obj: File | Directory, obj_content: str = "", obj_path:str | None = None, isFile: bool = True):
+        if request_obj is None:
+            return
         if (isFile):
             self.display_EditFile_GUI( request_obj, obj_content )
         else:
             obj_path = (obj_path if obj_path else (self.fileSystem.getCurrentWorkingDirectory() + "/")) + f"{request_obj.name}"
             self.fileSystem.changeDirectory( obj_path )
             self.reloadFileSystem()
-
 
     def __contentDisplayRightClick(self, event):
         isFile: bool = True
@@ -174,26 +175,28 @@ class FileSystem_GUI(Tk):
         except IndexError:
             return
 
-        if len(selected_item) <= 0:
-            return
+        request_obj: File | Directory = None
+        obj_content: str = ""
+        selected_path: str = ""
 
-        selected_path, selected_obj = self.__splitPathAndObject( selected_item )
+        if len(selected_item) > 0:
+            selected_path, selected_obj = self.__splitPathAndObject( selected_item )
 
-        if "[FILE]" in selected_item:
-            request_obj: File = self.getFileObj( selected_obj, "" if selected_path is None else selected_path )
-            obj_content: str = self.getFileContent( request_obj )
-            isFile = True
-        elif "[DIR]" in selected_item:
-            request_obj: Directory = self.getDirObj( selected_obj, "" if selected_path is None else selected_path )
-            obj_content = ""
-            isFile = False
+            if "[FILE]" in selected_item:
+                request_obj: File = self.getFileObj( selected_obj, "" if selected_path is None else selected_path )
+                obj_content: str = self.getFileContent( request_obj )
+                isFile = True
+            elif "[DIR]" in selected_item:
+                request_obj: Directory = self.getDirObj( selected_obj, "" if selected_path is None else selected_path )
+                obj_content = ""
+                isFile = False
 
         menu = Menu( tearoff=0 )
 
         menu.add_command(label="Abrir", font="Arial 12", command= lambda: self.__openSelectedObject( request_obj, obj_content, selected_path, isFile ))
         menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_item ))
-        menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( request_obj ))
-        menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI ( request_obj ))
+        menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( request_obj, selected_path ))
+        menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI ( request_obj, selected_path ))
         menu.add_command(label="Ver propiedades", font="Arial 12", command= lambda: self.display_seeProperties( request_obj ))
 
         try:
@@ -219,6 +222,9 @@ class FileSystem_GUI(Tk):
         self.__loadCurrentWorkingDirectory( f"Resultados de la búsqueda: {search_value}" )
 
     def __deleteFunction(self, selected_item: str):
+        if len(selected_item) <= 0:
+            return
+
         #verificacion y messagebox de si el archivo existe, tomar en cuenta que depende la operacion a realizar depende del tipo (Entonces primero debemos de sacar el tipo para luego proceder a eliminar)
         if messagebox.askyesno("Eliminar","¿Estás seguro que deseas eliminar este archivo/directorio?"):
             if "[FILE]" in selected_item:
@@ -229,7 +235,7 @@ class FileSystem_GUI(Tk):
                 print("__deleteFunction: Object not recognized")
                 return
 
-            self.__loadContentInFSDisplay()
+            self.reloadFileSystem()
 
         else:
             print ("Cancelando eliminacion")
@@ -246,18 +252,22 @@ class FileSystem_GUI(Tk):
         window = createDisk_GUI.CreateDisk_GUI(self)
         window.grab_set()
 
-    def display_Move_GUI(self, object):
-        window = move_GUI.Move_GUI(self, object)
+    def display_Move_GUI(self, object, selected_path: str):
+        if object is None:
+            return
+        window = move_GUI.Move_GUI(self, object, selected_path)
         window.deiconify()
         window.update_idletasks()
         window.grab_set()
 
     def display_seeProperties(self, object):
+        if object is None:
+            return
         window = seeProperties_GUI.SeeProperties_GUI(self, object)
         window.grab_set()
 
-    def display_Copy_GUI(self, selected_obj: File | Directory):
-        window = copy_GUI.CopyFiles(self, selected_obj)
+    def display_Copy_GUI(self, selected_obj: File | Directory, selected_path: str):
+        window = copy_GUI.CopyFiles(self, selected_obj, selected_path)
         window.grab_set()
 
     def display_CreateFile_GUI(self):

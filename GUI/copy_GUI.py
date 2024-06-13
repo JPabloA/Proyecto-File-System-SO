@@ -4,7 +4,7 @@ from src.directory import Directory
 import os
 
 class CopyFiles(Toplevel):
-    def __init__(self, parent, selected_obj: File | Directory):
+    def __init__(self, parent, selected_obj: File | Directory = None, selected_path: str = ""):
         super().__init__(parent)
 
         self.parent = parent
@@ -12,16 +12,16 @@ class CopyFiles(Toplevel):
         self.isFile = True
 
         path_origin: str = ""
-        if isinstance(selected_obj, File):
-            path_origin = f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/{selected_obj.name}.{selected_obj.extension}"
-            self.isFile = True
-        elif isinstance(selected_obj, Directory):
-            path_origin = f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/{selected_obj.name}"
-            self.isFile = False
-        else:
-            messagebox.showwarning("Copy", "Object could not be recognized")
-            print("Object could not be recognized")
-            return
+        if selected_obj is not None:
+            if isinstance(selected_obj, File):
+                path_origin = (selected_path if selected_path else f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/") + f"{selected_obj.name}.{selected_obj.extension}"
+                self.isFile = True
+            elif isinstance(selected_obj, Directory):
+                path_origin = (selected_path if selected_path else f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/") + f"{selected_obj.name}"
+                self.isFile = False
+            else:
+                print("Object could not be recognized")
+                return
 
         self.title("Copy Files")
         self.geometry("750x405")
@@ -63,6 +63,14 @@ class CopyFiles(Toplevel):
 
         canvas.create_text( 14.0, 19.0, anchor="nw", text="Copiar desde:", fill="#000000", font=("Inter", 16 * -1) )
         canvas.create_text( 14.0, 118.0, anchor="nw", text="Hasta:", fill="#000000", font=("Inter", 16 * -1) )
+
+        if self.parent.fileSystem.disk is None:
+            messagebox.showwarning("No se encontro ningún disco", "Asegúrese de crear un disco antes de copiar un archivo al file system")
+            self.entry_Origin.config( state="disabled" )
+            self.entry_Destiny.config( state="disabled" )
+            self.button_1.config( state="disabled" )
+            self.button_2.config( state="disabled" )
+            self.button_3.config( state="disabled" )
 
     def __getInputPaths(self):
         path_origin: str  = self.entry_Origin.get()
@@ -139,23 +147,39 @@ class CopyFiles(Toplevel):
         self.parent.reloadFileSystem()
 
     def __copy_VirtualToReal(self):
+        if self.selected_obj is None:
+            messagebox.showerror("No existe ningún objeto seleccionado", "La ruta ingresada no corresponde a ningún objeto dentro del file system")
+            return
+
         path_origin, path_destiny = self.__getInputPaths()
 
         def copy_file_virtual_to_real(file, dest):
             file_name = f"{file.name}.{file.extension}"
             file_path = os.path.join(dest, file_name)
+
             if os.path.isfile(file_path):
-                messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
-                return
+                overwrite = messagebox.askyesno("Archivo existe en el destino", f"Existe un archivo con el nombre {file_name} en el destino. ¿Desea sobrescribirlo?")
+                if not overwrite:
+                    print(f"Omitido archivo {file_name}")
+                    return
+
             with open(file_path, 'w') as archivo:
                 archivo.write(file.content)
             print(f"Archivo {file_name} copiado a {file_path}")
 
         def copy_directory_virtual_to_real(directory, dest):
             dir_path = os.path.join(dest, directory.name)
+
             if os.path.isdir(dir_path):
-                messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
-                return
+                overwrite = messagebox.askyesno("Directorio existe en el destino", f"Existe un directorio con el nombre {directory.name} en el destino. ¿Desea sobrescribirlo?")
+                if not overwrite:
+                    print(f"Omitido directorio {directory.name}")
+                    return
+                else:
+                    # Remove the existing directory if the user chose to overwrite it
+                    import shutil
+                    shutil.rmtree(dir_path)
+
             os.makedirs(dir_path, exist_ok=True)
             print(f"Directorio {directory.name} creado en {dir_path}")
 
@@ -171,6 +195,11 @@ class CopyFiles(Toplevel):
         self.parent.reloadFileSystem()
 
     def __copy_VirtualToVirtual(self):
+
+        if self.selected_obj is None:
+            messagebox.showerror("No existe ningún objeto seleccionado", "La ruta ingresada no corresponde a ningún objeto dentro del file system")
+            return
+
         path_origin, path_destiny = self.__getInputPaths()
         directory_destiny: Directory = self.parent.fileSystem.navigateToDirectory( path_destiny )
 

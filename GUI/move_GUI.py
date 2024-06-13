@@ -10,7 +10,7 @@ class objType(Enum):
 
 class Move_GUI(Toplevel):
 
-    def __init__(self, parent, object):
+    def __init__(self, parent, object: File | Directory = None, selected_path: str = ""):
         super().__init__(parent)
 
         self.parent = parent
@@ -39,23 +39,28 @@ class Move_GUI(Toplevel):
         canvas.create_text( 9.0, 14.0, anchor="nw", text="Mover archivo/directorio:", fill="#000000", font=("Inter", 16 * -1) )
         canvas.create_text( 9.0, 98.0, anchor="nw", text="Hasta:", fill="#000000", font=("Inter", 16 * -1) )
 
+        self.path_origin: str = selected_path
+        if self.object is not None:
+            if isinstance(self.object, File):
+                entry_path = (selected_path if selected_path else f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/") + f"{self.object.name}.{self.object.extension}"
+                self.isFile = True
+            elif isinstance(self.object, Directory):
+                entry_path = (selected_path if selected_path else f"{self.parent.fileSystem.getCurrentWorkingDirectory()}/") + f"{self.object.name}"
+                self.isFile = False
+            else:
+                print("Object could not be recognized")
+                return
+
         # Text input: Directory path
         self.textInput_SearchBar = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0)
         self.textInput_SearchBar.place( x=9.0, y=40.0, width=722.0, height=33.0 )
-
-        if isinstance(self.object, File):
-            self.textInput_SearchBar.insert(0, self.parent.fileSystem.getCurrentWorkingDirectory() + "/" + self.object.name + "." + self.object.extension)
-        else:
-            self.textInput_SearchBar.insert(0, self.parent.fileSystem.getCurrentWorkingDirectory() + "/" + self.object.name)
+        self.textInput_SearchBar.insert(0, entry_path)
         self.textInput_SearchBar.config(state="disabled")
 
         # Text input: Directory path 2
         self.textInput_SearchBar2 = Entry( self, bd=0, bg="#D9D9D9", fg="#000716", highlightthickness=0 )
         self.textInput_SearchBar2.place( x=9.0, y=126.0, width=722.0, height=33.0 )
-        if isinstance(self.object, File):
-            self.textInput_SearchBar2.insert(0, self.parent.fileSystem.getCurrentWorkingDirectory() + "/" + self.object.name + "." + self.object.extension)
-        else:
-            self.textInput_SearchBar2.insert(0, self.parent.fileSystem.getCurrentWorkingDirectory() + "/" + self.object.name)
+        self.textInput_SearchBar2.insert(0, entry_path)
 
         # Buttons
         self.button_1 = Button( self, text="Mover", borderwidth=0, highlightthickness=0, command=self.moveElement, relief="flat" )
@@ -68,20 +73,18 @@ class Move_GUI(Toplevel):
 
         dest_base_path = self.textInput_SearchBar2.get()
         name = dest_base_path.rsplit("/",1)[-1]
-        print("Name:", name)
         dest_path =  dest_base_path.rsplit("/",1)[0]
 
         if dest_path[-1] != "/":
             dest_path += "/"
 
-        print("Este es el dest path: ", dest_path)
-        currentDirectory = self.parent.fileSystem.currentDirectory
-        
+        currentDirectory: Directory = self.parent.fileSystem.navigateToDirectory(self.path_origin) if self.path_origin else self.parent.fileSystem.currentDirectory
+
         if isinstance(self.object, Directory):
             objectType = objType.DIRECTORY #!Directory
         else: #!File
             objectType = objType.FILE
-            
+
         if self.getExtension(name) == "":
             messagebox.showwarning("Falta la extension", "No se ha ingresado ninguna extension del archivo.")
             return
@@ -110,11 +113,6 @@ class Move_GUI(Toplevel):
                 messagebox.showwarning("Archivos con el mismo nombre", "Ya existe un archivo con el mismo nombre")
                 return
 
-
-        #Prints para ver cambios
-        print("base", currentDirectory.directories)
-        print("destino", destiny_dir.directories)
-
         # To delete and add the file or directory from the current dir dictionary to the dest dir dictionary
         if objectType == objType.DIRECTORY:
             currentDirectory.removeDirectory(self.object.name)
@@ -127,11 +125,6 @@ class Move_GUI(Toplevel):
             self.object.name = name.split(".")[0]
             self.object.extension = name.split(".")[1]
             destiny_dir.files[name] = self.object
-
-        #Prints para ver cambios
-        print("Luego del move")
-        print("base", currentDirectory.directories)
-        print("destino", destiny_dir.directories)
 
         self.parent.reloadFileSystem()
         self.destroy()
