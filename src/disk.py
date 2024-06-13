@@ -1,4 +1,5 @@
 from enum import Enum
+from tkinter import messagebox
 
 class SectorState(Enum):
     FREE = 0
@@ -39,12 +40,14 @@ class Disk:
     # Private: Divide the content in string chunks of the size of a sector
     def __splitContentInChunks(self, content):
         content_chunks: list[str] = [content[i:i + self.__sector_size] for i in range(0, len(content), self.__sector_size)]
+        
+        if content_chunks:
+            # To remove line jump
+            content_chunks[-1] = content_chunks[-1].strip()
 
-        # To remove line jump
-        content_chunks[-1] = content_chunks[-1].strip()
-
-        # Fill the last sector with non-use space (Intern Fragmentation)
-        content_chunks[-1] = content_chunks[-1].ljust(self.__sector_size, "0")
+            # Fill the last sector with non-use space (Intern Fragmentation)
+            content_chunks[-1] = content_chunks[-1].ljust(self.__sector_size, "0")
+        
         return content_chunks
 
     # Create the virtual disk file
@@ -76,6 +79,7 @@ class Disk:
 
             if (sectors_required > len(sectors_available)):
                 print("Write: Space requested not available")
+                messagebox.showwarning("Virtual disk!", "Write: Space requested not available")
                 return []
 
             # 4. Get the sectors to be written
@@ -98,6 +102,7 @@ class Disk:
 
             if (sectors_required > 0 and sectors_required > len(sectors_available)):
                 print("Write: Space requested not available")
+                messagebox.showwarning("Virtual disk!", "Write: Space requested not available")
                 return []
 
             # 4. Get the sectors to be written
@@ -168,6 +173,7 @@ class Disk:
         for sector_id in sectors_list:
             if sector_id < 0 or sector_id >= self.__num_sectors:
                 print(f"Sector ID {sector_id} out of bounds")
+                messagebox.showwarning("Virtual disk!", f"Sector ID {sector_id} out of bounds")
                 continue
 
             disk_list[ sector_id ] = f"{sector_id}:{'0' * self.__sector_size}\n"
