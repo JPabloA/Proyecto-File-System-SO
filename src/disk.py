@@ -152,7 +152,6 @@ class Disk:
         content = ""
         for sector_id in sectors_list:
             if sector_id < 0 or sector_id >= self.__num_sectors:
-                print(f"Sector ID {sector_id} out of bounds")
                 continue
 
             disk_line = disk_list[ sector_id ].split(":")
@@ -170,7 +169,6 @@ class Disk:
         # 1. Write the data from the sectors list
         for sector_id in sectors_list:
             if sector_id < 0 or sector_id >= self.__num_sectors:
-                messagebox.showwarning("Virtual disk!", f"Sector ID {sector_id} out of bounds")
                 continue
 
             disk_list[ sector_id ] = f"{sector_id}:{'0' * self.__sector_size}\n"
