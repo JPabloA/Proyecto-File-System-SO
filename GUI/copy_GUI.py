@@ -91,76 +91,82 @@ class CopyFiles(Toplevel):
 
     def __copy_RealToVirtual(self):
         path_origin, path_destiny = self.__getInputPaths()
-        directory_destiny: Directory = self.parent.fileSystem.navigateToDirectory( path_destiny )
+        directory_destiny = self.parent.fileSystem.navigateToDirectory(path_destiny)
 
-        if os.path.isfile(path_origin):
-            if not os.path.isfile(path_origin):
-                print(f"El archivo en la ruta {path_origin} no existe.")
-                return
+        def copy_file(src, dest_dir):
+            file_name = os.path.basename(src)
+            name, extension = os.path.splitext(file_name)
+            extension = extension.lstrip('.')
 
-            # Obtener el nombre del archivo y su extensión
-            file_name = os.path.basename(path_origin)
-            nombre, extension = os.path.splitext(file_name)
-            extension = extension.lstrip('.')  # Eliminar el punto inicial de la extensión
-
-            if not self.parent.isUniqueInDestinyDir( f"{file_name}.{extension}", "File", path_destiny ):
+            if not self.parent.isUniqueInDestinyDir(f"{name}.{extension}", "File", path_destiny):
                 messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
                 return
 
-            # Leer el contenido del archivo
-            with open(path_origin, 'r') as archivo:
+            with open(src, 'r') as archivo:
                 file_content = archivo.read()
 
-            self.parent.fileSystem.createFile(nombre, extension, file_content, directory_destiny)
+            try:
+                self.parent.fileSystem.createFile(name, extension, file_content, dest_dir)
+                print(f"Archivo {file_name} copiado a la memoria virtual.")
+            except ValueError as e:
+                messagebox.showerror("Error al copiar archivo", str(e))
 
-            print(f"Archivo {file_name} copiado a la memoria virtual.")
-        
-        elif os.path.isdir(path_origin):
-            dir_name = os.path.basename(os.path.normpath(path_origin))
+        def copy_directory(src, dest_dir):
+            dir_name = os.path.basename(os.path.normpath(src))
 
-            if not self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
+            if not self.parent.isUniqueInDestinyDir(dir_name, "Directory", path_destiny):
                 messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
-            else:
-                directory_destiny = self.parent.fileSystem.createDirectory( dir_name, directory_destiny )
-                print(f"Directorio {dir_name} copiado a la memoria virtual.")
+                return
+
+            new_directory = self.parent.fileSystem.createDirectory(dir_name, dest_dir)
+            print(f"Directorio {dir_name} copiado a la memoria virtual.")
+
+            for item in os.listdir(src):
+                item_path = os.path.join(src, item)
+                if os.path.isfile(item_path):
+                    copy_file(item_path, new_directory)
+                elif os.path.isdir(item_path):
+                    copy_directory(item_path, new_directory)
+
+        if os.path.isfile(path_origin):
+            copy_file(path_origin, directory_destiny)
+        elif os.path.isdir(path_origin):
+            copy_directory(path_origin, directory_destiny)
         else:
             print("Tipo de archivo no compatible")
+        self.parent.reloadFileSystem()
 
     def __copy_VirtualToReal(self):
         path_origin, path_destiny = self.__getInputPaths()
 
-        if self.isFile:
-            file_name = self.selected_obj.name
-            file_extension = self.selected_obj.extension
-            file_content = self.selected_obj.content
-
-            path_destiny = os.path.join( os.path.split( path_destiny )[0], f"{file_name}.{file_extension}" )
-
-            if os.path.isfile(path_destiny):
+        def copy_file_virtual_to_real(file, dest):
+            file_name = f"{file.name}.{file.extension}"
+            file_path = os.path.join(dest, file_name)
+            if os.path.isfile(file_path):
                 messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
-            else:
-            # Crear o sobrescribir el archivo en la ruta especificada
-                with open(path_destiny, 'w') as archivo:
-                    archivo.write(file_content)  # Puedes escribir contenido en el archivo si lo deseas
-                print(f"Archivo creado en: {path_destiny}")
-                self.destroy()
-        else:
-            dir_name = self.selected_obj.name
-            path_destiny = os.path.join( os.path.split( path_destiny )[0], f"{dir_name}" )
+                return
+            with open(file_path, 'w') as archivo:
+                archivo.write(file.content)
+            print(f"Archivo {file_name} copiado a {file_path}")
 
-            if os.path.isdir(path_destiny):
+        def copy_directory_virtual_to_real(directory, dest):
+            dir_path = os.path.join(dest, directory.name)
+            if os.path.isdir(dir_path):
                 messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
-            else:
-                try:
-                    # Crear el directorio y todos los directorios intermedios necesarios
-                    os.makedirs(path_destiny, exist_ok=True)
-                    print(f"Directorio creado en: {path_destiny}")
-                except OSError as e:
-                    print(f"Error al crear el directorio: {e}")
+                return
+            os.makedirs(dir_path, exist_ok=True)
+            print(f"Directorio {directory.name} creado en {dir_path}")
 
-                # Copy its content recursively
-                #self.__copy_DirectoryContentRecursively(self.selected_obj, path_destiny)
-                self.destroy()
+            for file in directory.getFiles().values():
+                copy_file_virtual_to_real(file, dir_path)
+            for subdirectory in directory.getDirectories().values():
+                copy_directory_virtual_to_real(subdirectory, dir_path)
+
+        if self.isFile:
+            copy_file_virtual_to_real(self.selected_obj, path_destiny)
+        else:
+            copy_directory_virtual_to_real(self.selected_obj, path_destiny)
+        self.parent.reloadFileSystem()
 
     def __copy_VirtualToVirtual(self):
         path_origin, path_destiny = self.__getInputPaths()
@@ -192,3 +198,4 @@ class CopyFiles(Toplevel):
                 # Copy its content recursively
                 self.__copy_DirectoryContentRecursively(self.selected_obj, directory_destiny)
                 self.destroy()
+                
