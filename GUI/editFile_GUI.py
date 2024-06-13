@@ -78,8 +78,6 @@ class EditFile(Toplevel):
         fullName = self.entry_1.get()
         fileName = self.getName(fullName)
 
-        #! Validacion para verificar que los datos del entry (file name.extension) sean correctos
-
         #Name verification
         if not self.uniqueFileNameVerification(fileName):
             return
@@ -90,10 +88,16 @@ class EditFile(Toplevel):
         #Content
         content = self.entry_2.get("1.0", "end")
         content = content.strip()
+        
+        # verif for content
+        if content == "":
+            messagebox.showwarning("Archivo sin contenido", "El archivo no puede quedar vacio. Favor ingresar contenido.")
+            return
 
         #Extension verification
         if extension == "":
-            messagebox.showwarning("Falta de extension del archivo", "El nombre del archivo debe poseer la extension deseada")
+            messagebox.showwarning("Falta de extension del archivo", "El nombre del archivo debe poseer la extension deseada.")
+            return
 
         # To obtain the sectors list
         oldSectorsList = self.parent.fileSystem.fat.getFileSectors(self.file.fat_index)

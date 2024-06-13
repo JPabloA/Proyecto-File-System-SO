@@ -179,8 +179,6 @@ class FileSystem_GUI(Tk):
     def __contentDisplayRightClick(self, event):
         isFile: bool = True
         # Get the selected file/directory
-
-        # TODO: Remove en lista
         
         selected_items = [ self.textArea_Display.get(i) for i in self.textArea_Display.curselection() ] 
         print("Estos son los resultados de la lista: ", selected_items)
@@ -212,9 +210,15 @@ class FileSystem_GUI(Tk):
 
         try:
             menu.tk_popup(event.x_root, event.y_root)
+            menu.grab_set()
+            menu.bind("<Leave>", lambda e: self.close_menu(e, menu))
         finally:
             menu.grab_release()
 
+    def close_menu(self, event, menu):
+        menu.grab_release()
+        menu.unpost()
+        
     def __loadContentInFSDisplay(self, search_result: list = [], search_request: bool = False):
         self.textArea_Display.delete(0, "end")
 
