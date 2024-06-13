@@ -39,8 +39,6 @@ class Disk:
 
     # Private: Divide the content in string chunks of the size of a sector
     def __splitContentInChunks(self, content):
-
-        print("Contenido", content, "Size", len(content))
         content_chunks: list[str] = [content[i:i + self.__sector_size] for i in range(0, len(content), self.__sector_size)]
 
         if len(content_chunks) > 0:
@@ -62,8 +60,6 @@ class Disk:
     def writeToDisk(self, sector_content: str, sectors_list: list[int] = []):
         # Quick fix
         sector_content = sector_content if len( sector_content ) > 0 else "\0"
-
-        print("Contenido puro", sector_content, "Size", len(sector_content))
         sector_content = sector_content.encode("utf-8").hex()
 
         # 0. Split content in chunks of the size of the sector
@@ -77,11 +73,8 @@ class Disk:
 
         occupied_sectors = []
 
-        print( "Content chunks", content_chunks )
-
         # Case: Creating an non-existing file
         if len(sectors_list) == 0:
-            print("> Case: Crear archivo")
             # 3. Get the count of sectors required to check if there is space left
             sectors_required  = len(content_chunks)
 
@@ -104,7 +97,6 @@ class Disk:
 
         # Case: Modifying an existing file
         else:
-            print("> Case: Modificar archivo")
             # 3. Check if the modification requieres more space
             sectors_required = len(content_chunks) - len(sectors_list)
 
@@ -114,9 +106,7 @@ class Disk:
 
             # 4. Get the sectors to be written
             selected_sectors = sectors_available[0:sectors_required]
-            print("Sectors to be written", selected_sectors)
 
-            print("Prev data", disk_list)
             # 5: Modify the existing data
             for index, sector_id in enumerate(sectors_list):
                 if index < len(content_chunks):
@@ -126,13 +116,9 @@ class Disk:
                     break
 
             occupied_sectors = sectors_list[0:len(content_chunks)]
-            print("Nueva data", disk_list)
 
             # Case 1: The file is equal or bigger in size (Requiered 0 or more sectors)
             if sectors_required >= 0:
-                print("> SubCase: Aumentar tamaño del archivo")
-                print(">> Occupied sectors", occupied_sectors)
-
                 # Second: Add the left data
                 selected_sectors_index = 0
                 for i in range(len( sectors_list ), len( content_chunks )):
@@ -147,9 +133,6 @@ class Disk:
 
             # Case 2: The file is smaller in size (Requiered free sectors)
             else:
-                print("> SubCase: Disminuir tamaño del archivo")
-                print(">> A remover:", sectors_list[ len( content_chunks ): ])
-
                 # First. Write the modified data
                 self.__listToDiskContent( disk_list )
                 # Second: Remove the usused occupied space
