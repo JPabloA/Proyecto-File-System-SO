@@ -102,26 +102,38 @@ class CopyFiles(Toplevel):
         path_origin, path_destiny = self.__getInputPaths()
         directory_destiny: Directory = self.parent.fileSystem.navigateToDirectory( path_destiny )
 
-        if not os.path.isfile(path_origin):
-            print(f"El archivo en la ruta {path_origin} no existe.")
-            return
+        if os.path.isfile(path_origin):
+            if not os.path.isfile(path_origin):
+                print(f"El archivo en la ruta {path_origin} no existe.")
+                return
 
-        # Obtener el nombre del archivo y su extensión
-        file_name = os.path.basename(path_origin)
-        nombre, extension = os.path.splitext(file_name)
-        extension = extension.lstrip('.')  # Eliminar el punto inicial de la extensión
+            # Obtener el nombre del archivo y su extensión
+            file_name = os.path.basename(path_origin)
+            nombre, extension = os.path.splitext(file_name)
+            extension = extension.lstrip('.')  # Eliminar el punto inicial de la extensión
 
-        if not self.parent.isUniqueInDestinyDir( f"{file_name}.{extension}", "File", path_destiny ):
-            messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
-            return
+            if not self.parent.isUniqueInDestinyDir( f"{file_name}.{extension}", "File", path_destiny ):
+                messagebox.showwarning("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino, por favor cambie el nombre del archivo o seleccione otra ruta")
+                return
 
-        # Leer el contenido del archivo
-        with open(path_origin, 'r') as archivo:
-            file_content = archivo.read()
+            # Leer el contenido del archivo
+            with open(path_origin, 'r') as archivo:
+                file_content = archivo.read()
 
-        self.parent.fileSystem.createFile(nombre, extension, file_content, directory_destiny)
+            self.parent.fileSystem.createFile(nombre, extension, file_content, directory_destiny)
 
-        print(f"Archivo {file_name} copiado a la memoria virtual.")
+            print(f"Archivo {file_name} copiado a la memoria virtual.")
+        
+        if os.path.isdir(path_origin):
+            dir_name = os.path.basename(os.path.normpath(path_origin))
+
+            if not self.parent.isUniqueInDestinyDir( dir_name, "Directory", path_destiny ):
+                messagebox.showwarning("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino, por favor cambie el nombre del directorio o seleccione otra ruta")
+            else:
+                directory_destiny = self.parent.fileSystem.createDirectory( dir_name, directory_destiny )
+                print(f"Directorio {dir_name} copiado a la memoria virtual.")
+        else:
+            print("Tipo de archivo no compatible")
 
     def __copy_VirtualToReal(self):
         if self.selected_obj is None:
