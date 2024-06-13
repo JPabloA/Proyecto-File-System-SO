@@ -181,22 +181,16 @@ class FileSystem_GUI(Tk):
         # Get the selected file/directory
 
         # TODO: Remove en lista
-        # print( "active",[ self.textArea_Display.get(i) for i in self.textArea_Display.curselection() ] )
-
-        try:
-            index = self.textArea_Display.nearest(event.y)
-            self.textArea_Display.select_clear(0, END)
-            self.textArea_Display.selection_set( index )
-            selected_item: str = self.textArea_Display.get( index )
-        except IndexError:
-            return
-
+        
+        selected_items = [ self.textArea_Display.get(i) for i in self.textArea_Display.curselection() ] 
+        print("Estos son los resultados de la lista: ", selected_items)
 
         request_obj: File | Directory = None
         obj_content: str = ""
         selected_path: str = ""
 
-        if len(selected_item) > 0:
+        if len(selected_items) > 0:
+            selected_item = selected_items[0]
             selected_path, selected_obj = self.__splitPathAndObject( selected_item )
 
             if "[FILE]" in selected_item:
@@ -211,7 +205,7 @@ class FileSystem_GUI(Tk):
         menu = Menu( tearoff=0 )
 
         menu.add_command(label="Abrir", font="Arial 12", command= lambda: self.__openSelectedObject( request_obj, obj_content, selected_path, isFile ))
-        menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_item ))
+        menu.add_command(label="Eliminar", font="Arial 12", command = lambda: self.__deleteFunction( selected_items ))
         menu.add_command(label="Copiar", font="Arial 12", command=lambda: self.display_Copy_GUI( request_obj, selected_path ))
         menu.add_command(label="Mover", font="Arial 12", command= lambda: self.display_Move_GUI ( request_obj, selected_path ))
         menu.add_command(label="Ver propiedades", font="Arial 12", command= lambda: self.display_seeProperties( request_obj ))
@@ -238,24 +232,24 @@ class FileSystem_GUI(Tk):
         self.__loadContentInFSDisplay( search_result, True )
         self.__loadCurrentWorkingDirectory( f"Resultados de la búsqueda: {search_value}" )
 
-    def __deleteFunction(self, selected_item: str):
-        if len(selected_item) <= 0:
-            return
-
+    def __deleteFunction(self, selected_items: list):
+        
         #verificacion y messagebox de si el archivo existe, tomar en cuenta que depende la operacion a realizar depende del tipo (Entonces primero debemos de sacar el tipo para luego proceder a eliminar)
         if messagebox.askyesno("Eliminar","¿Estás seguro que deseas eliminar este archivo/directorio?"):
-            if "[FILE]" in selected_item:
-                self.fileSystem.removeFile( selected_item.split("[FILE] ")[-1] )
-            elif "[DIR]" in selected_item:
-                self.fileSystem.remove_directory( selected_item.split("[DIR] ")[-1] )
-            else:
-                print("__deleteFunction: Object not recognized")
-                return
-
-            self.reloadFileSystem()
-
+            for element in selected_items:
+                if len(element) <= 0:
+                    return
+                if "[FILE]" in element:
+                    self.fileSystem.removeFile( element.split("[FILE] ")[-1] )
+                elif "[DIR]" in element:
+                    self.fileSystem.remove_directory( element.split("[DIR] ")[-1] )
+                else:
+                    print("__deleteFunction: Object not recognized")
+                    return
         else:
             print ("Cancelando eliminacion")
+        
+        self.reloadFileSystem()
 
     def display_CreateDirectory_GUI(self):
         window = createDirectory_GUI.CreateDirectory_GUI(self)
