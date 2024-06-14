@@ -106,15 +106,15 @@ class CopyFiles(Toplevel):
             messagebox.showerror("Directorio destino no existe", "El directorio de destino no pudo ser encontrado, por favor ingrese una ruta válida")
             return
 
-        def copy_file(src, dest_dir):
+        def copy_file(src, dest_dir, direct_copy: bool = True):
             file_name = os.path.basename(src)
             name, extension = os.path.splitext(file_name)
             extension = extension.lstrip('.')
 
             with open(src, 'r') as archivo:
-                file_content = archivo.read()
+                file_content = archivo.read().strip()
 
-            if not self.parent.isUniqueInDestinyDir(f"{name}.{extension}", "File", path_destiny):
+            if not self.parent.isUniqueInDestinyDir(f"{name}.{extension}", "File", path_destiny) and direct_copy:
                 answer = messagebox.askyesno("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino. ¿Desea sobreescribir su contenido?")
                 if answer:
                     selected_file: File = self.parent.getFileObj( f"{name}.{extension}", path_destiny )
@@ -156,12 +156,13 @@ class CopyFiles(Toplevel):
             for item in os.listdir(src):
                 item_path = os.path.join(src, item)
                 if os.path.isfile(item_path):
-                    copy_file(item_path, new_directory)
+                    copy_file(item_path, new_directory, False)
                 elif os.path.isdir(item_path):
                     copy_directory(item_path, new_directory)
             return True
 
         obj_type: str = ""
+        result = False
         if os.path.isfile(path_origin):
             result = copy_file(path_origin, directory_destiny)
             obj_type = "Archivo"
@@ -219,6 +220,7 @@ class CopyFiles(Toplevel):
 
             return True
         obj_type: str = ""
+        result = False
         if self.isFile:
             obj_type = "Archivo"
             result = copy_file_virtual_to_real(self.selected_obj, path_destiny)
