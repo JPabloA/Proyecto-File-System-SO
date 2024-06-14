@@ -112,7 +112,7 @@ class CopyFiles(Toplevel):
             extension = extension.lstrip('.')
 
             with open(src, 'r') as archivo:
-                file_content = archivo.read().strip()
+                file_content = archivo.read()
 
             if not self.parent.isUniqueInDestinyDir(f"{name}.{extension}", "File", path_destiny) and direct_copy:
                 answer = messagebox.askyesno("Archivo existe en el destino", "Existe un archivo con el mismo nombre en el destino. ¿Desea sobreescribir su contenido?")
