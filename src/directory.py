@@ -52,10 +52,6 @@ class Directory:
         element = self.files.pop(oldName)
         self.files[newName] = element
 
-    def clearDirectory(self):
-        self.directories = {}
-        self.files = {}
-
     def getFiles(self):
         return self.files
 

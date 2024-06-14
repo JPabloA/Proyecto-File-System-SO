@@ -85,7 +85,6 @@ class CreateFile(Toplevel):
             return True
         return False
 
-    # TODO: Validaciones necesarias para asegurar que el nombre sea apto
     def createFile(self):
         # Disk verification
         if not self.diskVerification():
@@ -104,11 +103,6 @@ class CreateFile(Toplevel):
         if not extension:
             messagebox.showwarning("Archivo sin extensión", "Falta la extension del archivo. Favor ingresar la extensión del archivo")
             return
-
-        # verif for content
-        if content == "":
-            messagebox.showwarning("Archivo sin contenido", "El archivo no puede quedar vacio. Favor ingresar contenido")
-            return
         
         # Ask if user wants to overwrite the file content
         if not self.uniqueFileNameVerification(f"{fileName}.{extension}"):
@@ -118,22 +112,27 @@ class CreateFile(Toplevel):
 
                 oldSectorsList = self.parent.fileSystem.fat.getFileSectors( selected_file.fat_index )
                 newSectorsList = self.parent.fileSystem.disk.writeToDisk( content, oldSectorsList )
-                if (newSectorsList == []):
-                    return
-                # To free and update the FAT
-                self.parent.fileSystem.fat.freeFATEntries( selected_file.fat_index )
-                newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
-                # To update the file object
-                selected_file.modifyContent( fileName, extension, content )
-                selected_file.assignSectors( newStartingIndex )
+                if (newSectorsList == -1):
+                    self.parent.fileSystem.fat.freeFATEntries(selected_file.fat_index)
+                    selected_file.fat_index = -1
+                elif (newSectorsList != []):
+                    # To free and update the FAT
+                    self.parent.fileSystem.fat.freeFATEntries( selected_file.fat_index )
+                    newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
+                    selected_file.assignSectors( newStartingIndex )
+                    # To update the file object
+                    selected_file.modifyContent( fileName, extension, content )
 
             self.parent.updateDiskState()
             self.destroy()
-
-        if extension != "":
-            self.parent.fileSystem.createFile(fileName, extension, content)
-            self.parent.reloadFileSystem()
-            self.parent.updateDiskState()
-            self.destroy()
+            print("Luego de reemplazar")
+            self.parent.fileSystem.testing_printFAT()
+            return
+  
+        self.parent.fileSystem.createFile(fileName, extension, content)
+        self.parent.reloadFileSystem()
+        self.parent.updateDiskState()
+        self.parent.fileSystem.testing_printFAT()
+        self.destroy()
 
 

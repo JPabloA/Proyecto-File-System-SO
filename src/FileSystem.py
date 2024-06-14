@@ -33,18 +33,20 @@ class FileSystem:
             selected_directory = self.currentDirectory
 
         newFile = File(name, extension, content)
-        sectors_list = self.disk.writeToDisk(content)
+        
+        if (content != ""):
+            sectors_list = self.disk.writeToDisk(content)
 
-        # Validacion sacarla a una nueva funcion por cuestiones de GUI
-        if len(sectors_list) == 0:
-            messagebox.showwarning("Espacio insuficiente en disco", "No hay suficiente espacio en disco para almacenar el archivo")
-            return
-            #raise ValueError("File couldnt be assing on disk - Not enough space on disk")
+            # Validacion sacarla a una nueva funcion por cuestiones de GUI
+            if len(sectors_list) == 0:
+                return
+                #raise ValueError("File couldnt be assing on disk - Not enough space on disk")
 
-        first_FAT_sector = self.fat.assingSectorList( sectors_list )
+            first_FAT_sector = self.fat.assingSectorList( sectors_list )
 
-        # File save the first sector
-        newFile.assignSectors( first_FAT_sector )
+            # File save the first sector
+            newFile.assignSectors( first_FAT_sector )
+            
         selected_directory.files[f"{name}.{extension}"] = newFile
 
     def getCurrentWorkingDirectory(self):
@@ -118,6 +120,12 @@ class FileSystem:
             except:
                 messagebox.showwarning("File System", f"Dir: {d_name} not found --- Continuing...")
 
+
+    def clearDirectory(self, selected_dir: Directory):
+        self.__clearDirectoryContent( selected_dir )
+        selected_dir.directories = {}
+        selected_dir.files = {}
+    
     # Remove a file by its name/path
     def removeFile(self, file_name: str):
         selected_directory: Directory = self.navigateToDirectory( file_name )

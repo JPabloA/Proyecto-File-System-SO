@@ -85,7 +85,7 @@ class Move_GUI(Toplevel):
         else: #!File
             objectType = objType.FILE
 
-        if self.getExtension(name) == "":
+        if objectType == objType.FILE and self.getExtension(name) == "":
             messagebox.showwarning("Falta la extension", "No se ha ingresado ninguna extension del archivo.")
             return
 
@@ -108,14 +108,14 @@ class Move_GUI(Toplevel):
             if not self.parent.isUniqueInDestinyDir(name, "Directory", dest_path):
                 answer = messagebox.askyesno("Directorios con el mismo nombre", "Ya existe un directorio con el mismo nombre. ¿Desea sobreescribir su contenido?")
                 if answer:
-                    destiny_dir.removeDirectory( name )
+                    self.parent.fileSystem.remove_directory( dest_base_path )
                 else:
                     return
         else:
             if not self.parent.isUniqueInDestinyDir(name, "File", dest_path):
                 answer = messagebox.askyesno("Archivos con el mismo nombre", "Ya existe un archivo con el mismo nombre. ¿Desea sobreescribir su contenido?")
                 if answer:
-                    destiny_dir.removeFile( name )
+                    self.parent.fileSystem.removeFile( dest_base_path )
                 else:
                     return
 

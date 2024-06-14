@@ -43,7 +43,7 @@ class CreateDirectory_GUI(Toplevel):
             answer = messagebox.askyesno("Sobreescribir directorio", "Se encontró un directorio con el mismo nombre. ¿Desea sobreescribir su contenido?")
             if answer:
                 selected_dir: Directory = self.parent.getDirObj( directory_name )
-                selected_dir.clearDirectory()
+                self.parent.fileSystem.clearDirectory (selected_dir)
             else:
                 return
         self.parent.reloadFileSystem()

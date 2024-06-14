@@ -128,12 +128,15 @@ class CopyFiles(Toplevel):
 
                     selected_file.modifyContent( name, extension, file_content )
                     selected_file.assignSectors( newStartingIndex )
+                    return True
             else:
                 try:
                     self.parent.fileSystem.createFile(name, extension, file_content, dest_dir)
-                    # TODO: Reemplazar por mensaje en messagebox (Exito de copiado)
+                    return True
                 except ValueError as e:
                     messagebox.showerror("Error al copiar archivo", str(e))
+                    return False
+            return False
 
         def copy_directory(src, dest_dir):
             dir_name = os.path.basename(os.path.normpath(src))
@@ -142,12 +145,13 @@ class CopyFiles(Toplevel):
                 answer = messagebox.askyesno("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino. ¿Desea sobreescribir su contenido?")
                 if answer:
                     selected_dir: Directory = self.parent.getDirObj( dir_name, path_destiny )
-                    selected_dir.clearDirectory()
+                    self.parent.fileSystem.clearDirectory (selected_dir)
 
                     directory_destiny.directories.pop( dir_name )
+                else:
+                    return False
 
             new_directory = self.parent.fileSystem.createDirectory(dir_name, dest_dir)
-            # TODO: Reemplazar por mensaje en messagebox (Exito de copiado)
 
             for item in os.listdir(src):
                 item_path = os.path.join(src, item)
@@ -155,13 +159,21 @@ class CopyFiles(Toplevel):
                     copy_file(item_path, new_directory)
                 elif os.path.isdir(item_path):
                     copy_directory(item_path, new_directory)
+            return True
 
+        obj_type: str = ""
         if os.path.isfile(path_origin):
-            copy_file(path_origin, directory_destiny)
+            result = copy_file(path_origin, directory_destiny)
+            obj_type = "Archivo"
         elif os.path.isdir(path_origin):
-            copy_directory(path_origin, directory_destiny)
+            result = copy_directory(path_origin, directory_destiny)
+            obj_type = "Directorio"
         else:
             messagebox.showwarning("Copy", "Tipo de archivo no compatible")
+
+        if result:
+            messagebox.showinfo(f"Acción completada", f"El {obj_type} fue copiado con éxito")
+            self.destroy()
 
         self.parent.updateDiskState()
         self.parent.reloadFileSystem()
@@ -180,12 +192,11 @@ class CopyFiles(Toplevel):
             if os.path.isfile(file_path):
                 overwrite = messagebox.askyesno("Archivo existe en el destino", f"Existe un archivo con el nombre {file_name} en el destino. ¿Desea sobrescribirlo?")
                 if not overwrite:
-                    print(f"Omitido archivo {file_name}")
-                    return
+                    return False
 
             with open(file_path, 'w') as archivo:
                 archivo.write(file.content)
-            # TODO: Reemplazar por mensaje en messagebox (Exito de copiado)
+            return True
 
         def copy_directory_virtual_to_real(directory, dest):
             dir_path = os.path.join(dest, directory.name)
@@ -193,25 +204,31 @@ class CopyFiles(Toplevel):
             if os.path.isdir(dir_path):
                 overwrite = messagebox.askyesno("Directorio existe en el destino", f"Existe un directorio con el nombre {directory.name} en el destino. ¿Desea sobrescribirlo?")
                 if not overwrite:
-                    print(f"Omitido directorio {directory.name}")
-                    return
+                    return False
                 else:
                     # Remove the existing directory if the user chose to overwrite it
                     import shutil
                     shutil.rmtree(dir_path)
 
             os.makedirs(dir_path, exist_ok=True)
-            # TODO: Reemplazar por mensaje en messagebox (Exito de copiado)
 
             for file in directory.getFiles().values():
                 copy_file_virtual_to_real(file, dir_path)
             for subdirectory in directory.getDirectories().values():
                 copy_directory_virtual_to_real(subdirectory, dir_path)
 
+            return True
+        obj_type: str = ""
         if self.isFile:
-            copy_file_virtual_to_real(self.selected_obj, path_destiny)
+            obj_type = "Archivo"
+            result = copy_file_virtual_to_real(self.selected_obj, path_destiny)
         else:
-            copy_directory_virtual_to_real(self.selected_obj, path_destiny)
+            obj_type = "Directorio"
+            result = copy_directory_virtual_to_real(self.selected_obj, path_destiny)
+
+        if result:
+            messagebox.showinfo(f"Acción completada", f"El {obj_type} fue copiado con éxito")
+            self.destroy()
 
         self.parent.updateDiskState()
         self.parent.reloadFileSystem()
@@ -224,6 +241,9 @@ class CopyFiles(Toplevel):
 
         path_origin, path_destiny = self.__getInputPaths()
         directory_destiny: Directory = self.parent.fileSystem.navigateToDirectory( path_destiny )
+
+        obj_type: str = ""
+        copy_result: bool = True
 
         if directory_destiny is None:
             messagebox.showerror("Directorio destino no existe", "El directorio de destino no pudo ser encontrado, por favor ingrese una ruta válida")
@@ -248,10 +268,12 @@ class CopyFiles(Toplevel):
 
                     selected_file.modifyContent( file_name, file_extension, file_content )
                     selected_file.assignSectors( newStartingIndex )
+                    copy_result = True
+                else:
+                    copy_result = False
             else:
                 self.parent.fileSystem.createFile( file_name, file_extension, file_content, directory_destiny )
-                self.parent.updateDiskState()
-                self.destroy()
+                copy_result = True
         else:
             dir_name = self.selected_obj.name
 
@@ -259,14 +281,22 @@ class CopyFiles(Toplevel):
                 answer = messagebox.askyesno("Directorio existe en el destino", "Existe un directorio con el mismo nombre en el destino. ¿Desea sobreescribir su contenido?")
                 if answer:
                     selected_dir: Directory = self.parent.getDirObj( dir_name, path_destiny )
-                    selected_dir.clearDirectory()
+                    self.parent.fileSystem.clearDirectory (selected_dir)
 
                     directory_destiny.directories.pop( dir_name )
+                else:
+                    copy_result = False
+                    return
 
             # Create the directory in its destiny
             directory_destiny = self.parent.fileSystem.createDirectory( dir_name, directory_destiny )
 
             # Copy its content recursively
             self.__copy_DirectoryContentRecursively(self.selected_obj, directory_destiny)
-            self.parent.updateDiskState()
+            copy_result = True
+
+        self.parent.updateDiskState()
+
+        if copy_result:
+            messagebox.showinfo(f"Acción completada", f"El {obj_type} fue copiado con éxito")
             self.destroy()

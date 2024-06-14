@@ -58,8 +58,14 @@ class Disk:
 
     # Write into the virtual disk
     def writeToDisk(self, sector_content: str, sectors_list: list[int] = []):
+        
+        # validation (test)
+        if sector_content == "" and len(sectors_list) > 0:
+            self.removeFromDisk(sectors_list)
+            return -1
+        
         # Quick fix
-        sector_content = sector_content if len( sector_content ) > 0 else "\0"
+        #sector_content = sector_content if len( sector_content ) > 0 else "\0"
         sector_content = sector_content.encode("utf-8").hex()
 
         # 0. Split content in chunks of the size of the sector
@@ -79,7 +85,7 @@ class Disk:
             sectors_required  = len(content_chunks)
 
             if (sectors_required > len(sectors_available)):
-                messagebox.showwarning("Modificaciones fallidas","No hay suficiente espacio en el disco para almacenar el archivo.")
+                messagebox.showwarning("Espacio insuficiente en disco", "No hay suficiente espacio en disco para almacenar el archivo")
                 return []
 
             # 4. Get the sectors to be written
@@ -101,7 +107,7 @@ class Disk:
             sectors_required = len(content_chunks) - len(sectors_list)
 
             if (sectors_required > 0 and sectors_required > len(sectors_available)):
-                messagebox.showwarning("Modificaciones fallidas","No hay suficiente espacio en el disco para almacenar el archivo.")
+                messagebox.showwarning("Espacio insuficiente en disco", "No hay suficiente espacio en disco para almacenar el archivo")
                 return []
 
             # 4. Get the sectors to be written

@@ -88,11 +88,6 @@ class EditFile(Toplevel):
         #Content
         content = self.entry_2.get("1.0", "end")
         content = content.strip()
-        
-        # verif for content
-        if content == "":
-            messagebox.showwarning("Archivo sin contenido", "El archivo no puede quedar vacio. Favor ingresar contenido.")
-            return
 
         #Extension verification
         if extension == "":
@@ -104,22 +99,24 @@ class EditFile(Toplevel):
 
         # To write the new content
         newSectorsList = self.parent.fileSystem.disk.writeToDisk(content, oldSectorsList)
-        if (newSectorsList == []):
-            return
+        if (newSectorsList == -1):
+            self.parent.fileSystem.fat.freeFATEntries(self.file.fat_index)
+            self.file.fat_index = -1
+        elif (newSectorsList != []):
+            # To free and update the FAT
+            self.parent.fileSystem.fat.freeFATEntries(self.file.fat_index)
+            newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
 
-        # To free and update the FAT
-        self.parent.fileSystem.fat.freeFATEntries(self.file.fat_index)
-        newStartingIndex = self.parent.fileSystem.fat.assingSectorList(newSectorsList)
+            # To update directory in case that the user modify file name or extension
+            currentDirectory = self.parent.fileSystem.currentDirectory
+            currentDirectory.changeFileNameInDict(self.file.name + "." + self.file.extension, fullName)
 
-        # To update directory in case that the user modify file name or extension
-        currentDirectory = self.parent.fileSystem.currentDirectory
-        currentDirectory.changeFileNameInDict(self.file.name + "." + self.file.extension, fullName)
-
+            self.file.assignSectors(newStartingIndex)
+            
         # To update the file object
         self.file.modifyContent( fileName, extension, content)
 
-        self.file.assignSectors(newStartingIndex)
-
         self.parent.reloadFileSystem()
         self.parent.updateDiskState()
+        #self.parent.fileSystem.testing_printFAT()
         self.destroy()
