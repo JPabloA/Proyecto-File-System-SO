@@ -31,8 +31,8 @@ class EditFile(Toplevel):
             highlightthickness=0
         )
         self.entry_1.insert(0, fileObj.name + "." + fileObj.extension)
-        #self.entry_1.insert(0, "RUTA DEL ARCHIVO")
         self.entry_1.place(x=9.0, y=10.0, width=722.0, height=33.0)
+        self.entry_1.config( state="disabled" )
 
         # Button: To save changes
         self.button_1 = Button(
@@ -67,20 +67,10 @@ class EditFile(Toplevel):
         else:
             return ""
 
-    def uniqueFileNameVerification(self, fileName):
-        if not fileName in self.parent.fileSystem.currentDirectory.files:
-            return True
-        messagebox.showwarning("Archivo con mismo nombre","Se ha encontrado un archivo con el mismo nombre. Favor ingresar un nombre diferente al archivo.")
-        return False
-
     def saveButton(self):
         #Name
         fullName = self.entry_1.get()
         fileName = self.getName(fullName)
-
-        #Name verification
-        if not self.uniqueFileNameVerification(fileName):
-            return
 
         #Extension
         extension = self.getExtension(fullName)
@@ -112,11 +102,10 @@ class EditFile(Toplevel):
             currentDirectory.changeFileNameInDict(self.file.name + "." + self.file.extension, fullName)
 
             self.file.assignSectors(newStartingIndex)
-            
+
         # To update the file object
         self.file.modifyContent( fileName, extension, content)
 
         self.parent.reloadFileSystem()
         self.parent.updateDiskState()
-        #self.parent.fileSystem.testing_printFAT()
         self.destroy()
