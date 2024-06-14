@@ -162,6 +162,7 @@ class CopyFiles(Toplevel):
             return True
 
         obj_type: str = ""
+        result = False
         if os.path.isfile(path_origin):
             result = copy_file(path_origin, directory_destiny)
             obj_type = "Archivo"
@@ -219,6 +220,7 @@ class CopyFiles(Toplevel):
 
             return True
         obj_type: str = ""
+        result = False
         if self.isFile:
             obj_type = "Archivo"
             result = copy_file_virtual_to_real(self.selected_obj, path_destiny)
